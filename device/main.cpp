@@ -223,22 +223,16 @@ void test_fixed_pipeline()
     Shader vsShader = loadVS_Simple();
     Shader psShader = loadPS_Simple();
 
-    // setup vs constants.
-    Mat44f matWorldView;
+    // setup camera
+    Mat44f matView;
+    Mat44f matProj;
     {
-        // transformation matrices
-        //Vec3f camPos = {0.0f, 0.0f, 1.0f};
-        //Vec3f camUp = {0.0f, 1.0f, 0.0f};
-        //Vec3f camRight = {1.0f, 0.0f, 0.0f};
-        // Mat44f matWorldView = calcViewMatrix(camPos, camUp, camRight);
-
         Vec3f targetPos{0.0, 0.0, 0.0};
         Vec3f camPos{3.0, 2.0, 5.0};
         Vec3f camUp{0.0, 1.0, 0.0};
-        matWorldView = lookAtViewMatrix(targetPos, camPos, camUp);
+        matView = lookAtViewMatrix(targetPos, camPos, camUp);
 
         bool useOrth = false;
-        Mat44f matProj;
         if (useOrth)
         {
             float orthWidth = 3.0f;
@@ -250,18 +244,8 @@ void test_fixed_pipeline()
             matProj = projPerspective(40, (float)WIDTH/HEIGHT, 1.1, 20);
         }
 
-        Mat44f matWorldViewProj = matProj * matWorldView;
-
-        Mat44f* pMatWorldView = (Mat44f*)vsShader.getConstantAddr("mWorldView");
-        *pMatWorldView = matWorldView;
-
-        Mat44f* pMatWorldViewProj = (Mat44f*)vsShader.getConstantAddr("mWorldViewProj");
-        *pMatWorldViewProj = matWorldViewProj;
-
-        //Mat44f matWorld;
-        //Mat44f matWorldViewIT;
-        //Mat44f matViewIT;
     }
+    // setup vs constants.
 
     // setup ps constants
     {
@@ -272,7 +256,8 @@ void test_fixed_pipeline()
         float* pLightPower  = (float*)psShader.getConstantAddr("cLightPower");
         float* pLightShininess  = (float*)psShader.getConstantAddr("cLightShininess");
 
-        Vec4f lightPos = matWorldView * Vec4f{8.0, 8.0, 5.0, 1.0};
+        Vec4f lightPosWorld = Vec4f{8.0, 8.0, 5.0, 1.0};
+        Vec4f lightPos = matView * lightPosWorld;
 
         *pLightPos = {lightPos.x, lightPos.y, lightPos.z};
         *pLightAmbient = {0.0, 0.0, 0.0};
@@ -294,6 +279,24 @@ void test_fixed_pipeline()
 
         Model::genCuoid(vertices, normals, texCoords, indices);
 
+        // adjust world position
+        {
+            Mat44f matWorld;
+            matWorld.make_identity();
+            transform(matWorld, {-1.0f, 0.0f, 0.0f});
+
+            Mat44f matWorldViewProj = matProj * (matView * matWorld);
+
+            Mat44f* pMatWorldView = (Mat44f*)vsShader.getConstantAddr("mWorldView");
+            *pMatWorldView = matView;
+
+            Mat44f* pMatWorldViewProj = (Mat44f*)vsShader.getConstantAddr("mWorldViewProj");
+            *pMatWorldViewProj = matWorldViewProj;
+        }
+
+        //Mat44f matWorldViewIT;
+        //Mat44f matViewIT;
+
         device.setVertexBufferChannel(Semantic::Position0, (U8*)vertices.data(), 0, sizeof(Vec3f));
         // device.setVertexBufferChannel(Semantic::Color0, (U8*)normals.data(), 0, sizeof(Vec3f));
         device.setVertexBufferChannel(Semantic::Normal0, (U8*)normals.data(), 0, sizeof(Vec3f));
@@ -313,6 +316,21 @@ void test_fixed_pipeline()
         std::vector<U32> indices;
 
         Model::genSphere(vertices, normals, texCoords, indices);
+
+        // adjust world position
+        {
+            Mat44f matWorld;
+            matWorld.make_identity();
+            transform(matWorld, {+1.0f, 0.0f, 0.0f});
+
+            Mat44f matWorldViewProj = matProj * (matView * matWorld);
+
+            Mat44f* pMatWorldView = (Mat44f*)vsShader.getConstantAddr("mWorldView");
+            *pMatWorldView = matView;
+
+            Mat44f* pMatWorldViewProj = (Mat44f*)vsShader.getConstantAddr("mWorldViewProj");
+            *pMatWorldViewProj = matWorldViewProj;
+        }
 
         device.setVertexBufferChannel(Semantic::Position0, (U8*)vertices.data(), 0, sizeof(Vec3f));
         // device.setVertexBufferChannel(Semantic::Color0, (U8*)normals.data(), 0, sizeof(Vec3f));
