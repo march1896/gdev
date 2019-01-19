@@ -127,7 +127,7 @@ namespace Device {
         SHADER_CONST float cLightShininess;
         // SHADER_CONST float screenGamma; // Assume the monitor is calibrated to the sRGB color space
 
-        static void Blinn_Phone();
+        static void Blinn_Phong();
         // [ref](https://en.wikipedia.org/wiki/Blinn%E2%80%93Phong_shading_model)
         static void ps_main()
         {
@@ -136,10 +136,10 @@ namespace Device {
             // std::cout << "PS: " << inPosClip << std::endl;
 
             // outColor = inColor;
-            Blinn_Phone();
+            Blinn_Phong();
         }
 
-        static void Blinn_Phone() 
+        static void Blinn_Phong()
         {
             Vec3f normal = normalize(inNormal);
             Vec3f lightDir = cLightPos - inPosView;
@@ -159,17 +159,14 @@ namespace Device {
 
                 float specAngle = std::max(dot(halfDir, normal), 0.0f);
                 specular = pow(specAngle, cLightShininess);
+
             }
-            else
-            {
-                // This should not happen if back face is culled.
-                // std::cout << "TODO:" << std::endl;
-            }
-            Vec3f colorLinear = cLightAmbient;
+
+            Vec3f ambientLinear = cLightAmbient;
             Vec3f diffuseLinear = lambertian * cLightDiffuse * cLightPower / distance;
             Vec3f specularLinear = specular * cLightSpecular * cLightPower / distance;
 
-            outColor = colorLinear + diffuseLinear + specularLinear;
+            outColor = ambientLinear + diffuseLinear + specularLinear;
 
             // apply gamma correction (assume cLightAmbient, cLightDiffuse and cLightSpecular
             // have been linearized, i.e. have no gamma correction in them)

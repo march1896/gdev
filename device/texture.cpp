@@ -1,3 +1,4 @@
+#include "vmath.h"
 #include "texture.h"
 #include "bitmap_image.h"
 
@@ -17,7 +18,9 @@ namespace Device {
 
                 Vec3f const& color = colorTarget.getPixel(x, y);
                 image.set_pixel(screen_x, screen_y,
-                    color.x * 255, color.y * 255, color.z * 255);
+                    clamp(U32(color.x * 255), 0u, 255u),
+                    clamp(U32(color.y * 255), 0u, 255u),
+                    clamp(U32(color.z * 255), 0u, 255u));
             }
         }
 
