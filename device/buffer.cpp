@@ -137,6 +137,8 @@ namespace Device {
             free(m_storage);
         }
         m_storage = (U8*)malloc(m_capacity * m_structure.getSize());
+
+        m_begin = m_end = 0;
     }
 
     U32 FifoStream::getNumElements() const

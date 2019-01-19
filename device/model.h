@@ -10,9 +10,9 @@ namespace Device { namespace Model {
 
     void genTriangles(std::vector<Vec3f>& vertices, std::vector<Vec3f>& normals, std::vector<Vec2f>& texCoords, std::vector<U32>& indices);
 
-    void genCube(std::vector<Vec3f>& vertices, std::vector<Vec3f>& normals, std::vector<Vec2f>& texCoords, std::vector<U32>& indices);
+    void genCuoid(std::vector<Vec3f>& vertices, std::vector<Vec3f>& normals, std::vector<Vec2f>& texCoords, std::vector<U32>& indices, float wx=1.5f, float wy=1.5f, float wz=1.5f);
 
-    void genSphere(std::vector<Vec3f>& vertices, std::vector<Vec3f>& normals, std::vector<Vec2f>& texCoords, std::vector<U32>& indices);
+    void genSphere(std::vector<Vec3f>& vertices, std::vector<Vec3f>& normals, std::vector<Vec2f>& texCoords, std::vector<U32>& indices, float radius=1.0f, U32 sectorCount=20, U32 stackCount=20);
 
     void genTeapot(std::vector<Vec3f>& vertices, std::vector<Vec3f>& normals, std::vector<Vec2f>& texCoords, std::vector<U32>& indices);
 } // namespace Model

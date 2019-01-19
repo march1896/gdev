@@ -59,9 +59,8 @@ namespace Device {
 
     void OutputMerger::comsumeOneInput()
     {
-        // the final writing framebuffer stage
+        // TODO: early Z
         Vec4f pos = m_inPosition->readAs<Vec4f>();
-        Vec3f color = m_inColor->readAs<Vec3f>();
 
         int screen_x = std::nearbyint(pos.x * m_width);
         int screen_y = std::nearbyint(pos.y * m_height);
@@ -70,14 +69,18 @@ namespace Device {
         screen_x = (screen_x + m_width) / 2;
         screen_y = (screen_y + m_height) / 2;
 
-        m_colorTarget.setPixel(screen_x, screen_y, color);
-
-        // TODO: early Z
         // map [-1, 1] to [1, 0]
         float depth = -(pos.z - 1.0f) / 2.0f;
-        if (depth > m_depthTarget.getPixel(screen_x, screen_y))
+        bool zTestResult = depth > m_depthTarget.getPixel(screen_x, screen_y);
+        if (zTestResult)
         {
             m_depthTarget.setPixel(screen_x, screen_y, depth);
+        }
+
+        if (zTestResult)
+        {
+            Vec3f color = m_inColor->readAs<Vec3f>();
+            m_colorTarget.setPixel(screen_x, screen_y, color);
         }
     }
 

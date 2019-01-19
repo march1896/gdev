@@ -86,45 +86,48 @@ namespace Device { namespace Model {
         fillVectors(vertices, normals, texCoords, indices, vb, COUNT_OF(vb), ib, COUNT_OF(ib));
     }
 
-    void genCube(std::vector<Vec3f>& vertices, std::vector<Vec3f>& normals, std::vector<Vec2f>& texCoords, std::vector<U32>& indices)
+    void genCuoid(std::vector<Vec3f>& vertices, std::vector<Vec3f>& normals, std::vector<Vec2f>& texCoords, std::vector<U32>& indices, float wx, float wy, float wz)
     {
+        float lx = wx / 2.0f;
+        float ly = wy / 2.0f;
+        float lz = wz / 2.0f;
         static VertexFormat vb[] =
         {
             // front
-            {{-0.5f, -0.5f, +0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f, +1.0f}},
-            {{+0.5f, -0.5f, +0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, +1.0f}},
-            {{+0.5f, +0.5f, +0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, +1.0f}},
-            {{-0.5f, +0.5f, +0.5f}, {1.0f, 1.0f, 0.0f}, {0.0f, 0.0f, +1.0f}},
+            {{-lx, -ly, +lz}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f, +1.0f}},
+            {{+lx, -ly, +lz}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, +1.0f}},
+            {{+lx, +ly, +lz}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, +1.0f}},
+            {{-lx, +ly, +lz}, {1.0f, 1.0f, 0.0f}, {0.0f, 0.0f, +1.0f}},
 
             // back
-            {{+0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f, -1.0f}},
-            {{-0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, -1.0f}},
-            {{-0.5f, +0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, -1.0f}},
-            {{+0.5f, +0.5f, -0.5f}, {1.0f, 1.0f, 0.0f}, {0.0f, 0.0f, -1.0f}},
+            {{+lx, -ly, -lz}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f, -1.0f}},
+            {{-lx, -ly, -lz}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, -1.0f}},
+            {{-lx, +ly, -lz}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, -1.0f}},
+            {{+lx, +ly, -lz}, {1.0f, 1.0f, 0.0f}, {0.0f, 0.0f, -1.0f}},
 
             // left
-            {{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}},
-            {{-0.5f, -0.5f, +0.5f}, {0.0f, 1.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}},
-            {{-0.5f, +0.5f, +0.5f}, {0.0f, 0.0f, 1.0f}, {-1.0f, 0.0f, 0.0f}},
-            {{-0.5f, +0.5f, -0.5f}, {1.0f, 1.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}},
+            {{-lx, -ly, -lz}, {1.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}},
+            {{-lx, -ly, +lz}, {0.0f, 1.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}},
+            {{-lx, +ly, +lz}, {0.0f, 0.0f, 1.0f}, {-1.0f, 0.0f, 0.0f}},
+            {{-lx, +ly, -lz}, {1.0f, 1.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}},
 
             // right
-            {{+0.5f, -0.5f, +0.5f}, {1.0f, 0.0f, 0.0f}, {+1.0f, 0.0f, 0.0f}},
-            {{+0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {+1.0f, 0.0f, 0.0f}},
-            {{+0.5f, +0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}, {+1.0f, 0.0f, 0.0f}},
-            {{+0.5f, +0.5f, +0.5f}, {1.0f, 1.0f, 0.0f}, {+1.0f, 0.0f, 0.0f}},
+            {{+lx, -ly, +lz}, {1.0f, 0.0f, 0.0f}, {+1.0f, 0.0f, 0.0f}},
+            {{+lx, -ly, -lz}, {0.0f, 1.0f, 0.0f}, {+1.0f, 0.0f, 0.0f}},
+            {{+lx, +ly, -lz}, {0.0f, 0.0f, 1.0f}, {+1.0f, 0.0f, 0.0f}},
+            {{+lx, +ly, +lz}, {1.0f, 1.0f, 0.0f}, {+1.0f, 0.0f, 0.0f}},
 
             // bottom
-            {{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, -1.0f, 0.0f}},
-            {{+0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, -1.0f, 0.0f}},
-            {{+0.5f, -0.5f, +0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, -1.0f, 0.0f}},
-            {{-0.5f, -0.5f, +0.5f}, {1.0f, 1.0f, 0.0f}, {0.0f, -1.0f, 0.0f}},
+            {{-lx, -ly, -lz}, {1.0f, 0.0f, 0.0f}, {0.0f, -1.0f, 0.0f}},
+            {{+lx, -ly, -lz}, {0.0f, 1.0f, 0.0f}, {0.0f, -1.0f, 0.0f}},
+            {{+lx, -ly, +lz}, {0.0f, 0.0f, 1.0f}, {0.0f, -1.0f, 0.0f}},
+            {{-lx, -ly, +lz}, {1.0f, 1.0f, 0.0f}, {0.0f, -1.0f, 0.0f}},
 
             // top
-            {{-0.5f, +0.5f, +0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, +1.0f, 0.0f}},
-            {{+0.5f, +0.5f, +0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, +1.0f, 0.0f}},
-            {{+0.5f, +0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, +1.0f, 0.0f}},
-            {{-0.5f, +0.5f, -0.5f}, {1.0f, 1.0f, 0.0f}, {0.0f, +1.0f, 0.0f}},
+            {{-lx, +ly, +lz}, {1.0f, 0.0f, 0.0f}, {0.0f, +1.0f, 0.0f}},
+            {{+lx, +ly, +lz}, {0.0f, 1.0f, 0.0f}, {0.0f, +1.0f, 0.0f}},
+            {{+lx, +ly, -lz}, {0.0f, 0.0f, 1.0f}, {0.0f, +1.0f, 0.0f}},
+            {{-lx, +ly, -lz}, {1.0f, 1.0f, 0.0f}, {0.0f, +1.0f, 0.0f}},
         };
 
         static U32 ib[] =
@@ -158,17 +161,13 @@ namespace Device { namespace Model {
     }
 
     // [ref](http://www.songho.ca/opengl/gl_sphere.html)
-    void genSphere(std::vector<Vec3f>& vertices, std::vector<Vec3f>& normals, std::vector<Vec2f>& texCoords, std::vector<U32>& indices)
+    void genSphere(std::vector<Vec3f>& vertices, std::vector<Vec3f>& normals, std::vector<Vec2f>& texCoords, std::vector<U32>& indices, float radius, U32 sectorCount, U32 stackCount)
     {
         // clear memory of prev arrays
         vertices.clear();
         normals.clear();
         texCoords.clear();
         indices.clear();
-
-        float const radius = 1.0f;
-        U32 sectorCount = 20;
-        U32 stackCount = 20;
 
         float x, y, z, xy;                              // vertex position
         float nx, ny, nz, lengthInv = 1.0f / radius;    // vertex normal

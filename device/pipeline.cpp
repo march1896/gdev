@@ -90,8 +90,7 @@ namespace Device {
         // Assume all vertices are processed.
         assert(m_vsInStream.isEmpty());
 
-        // TODO: perspective divide?
-        // set the vertex output into rasterizer as a buffer.
+        // set the vertex output into rasterizer as a buffer, mark all as processed.
         m_rasterizer.bindVSOutput(m_vsOutStream);
 
         // setup the rasterizer output ports, keep the same as psProgram.

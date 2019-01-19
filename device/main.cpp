@@ -285,13 +285,14 @@ void test_fixed_pipeline()
     device.setVSProgram(vsShader);
     device.setPSProgram(psShader);
 
-    std::vector<Vec3f> vertices;
-    std::vector<Vec3f> normals;
-    std::vector<Vec2f> texCoords;
-    std::vector<U32> indices;
-    // setup geometries
+    // if (false)
     {
-        Model::genTeapot(vertices, normals, texCoords, indices);
+        std::vector<Vec3f> vertices;
+        std::vector<Vec3f> normals;
+        std::vector<Vec2f> texCoords;
+        std::vector<U32> indices;
+
+        Model::genCuoid(vertices, normals, texCoords, indices);
 
         device.setVertexBufferChannel(Semantic::Position0, (U8*)vertices.data(), 0, sizeof(Vec3f));
         // device.setVertexBufferChannel(Semantic::Color0, (U8*)normals.data(), 0, sizeof(Vec3f));
@@ -300,10 +301,29 @@ void test_fixed_pipeline()
         device.setVertexBufferLength(vertices.size());
 
         device.setIndexBuffer((U8*)indices.data(), 0, sizeof(U32), indices.size());
+
+        device.drawIndexed();
     }
 
-    device.drawIndexed();
+    // if (false)
+    {
+        std::vector<Vec3f> vertices;
+        std::vector<Vec3f> normals;
+        std::vector<Vec2f> texCoords;
+        std::vector<U32> indices;
 
+        Model::genSphere(vertices, normals, texCoords, indices);
+
+        device.setVertexBufferChannel(Semantic::Position0, (U8*)vertices.data(), 0, sizeof(Vec3f));
+        // device.setVertexBufferChannel(Semantic::Color0, (U8*)normals.data(), 0, sizeof(Vec3f));
+        device.setVertexBufferChannel(Semantic::Normal0, (U8*)normals.data(), 0, sizeof(Vec3f));
+
+        device.setVertexBufferLength(vertices.size());
+
+        device.setIndexBuffer((U8*)indices.data(), 0, sizeof(U32), indices.size());
+
+        device.drawIndexed();
+    }
     device.present();
 }
 
