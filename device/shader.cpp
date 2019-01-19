@@ -136,13 +136,13 @@ namespace Device {
 
         // TODO: move this to shader constants.
         const Vec3f lightPos{8.0, 8.0, 10.0};
-        const Vec3f lightColor{1.0, 1.0, 1.0};
+        // const Vec3f lightColor{1.0, 1.0, 1.0};
         const float lightPower = 160.0;
-        const Vec3f ambientColor{0.1, 0.1, 0.1};
-        const Vec3f diffuseColor{0.5, 0.0, 0.0};
-        const Vec3f specColor{1.0, 0.0, 0.0};
-        const float shininess = 5.0;
-        const float screenGamma = 2.2; // Assume the monitor is calibrated to the sRGB color space
+        const Vec3f ambientColor{0.05, 0.05, 0.05};
+        const Vec3f diffuseColor{1.0, 0.0, 0.0};
+        const Vec3f specColor{1.0, 1.0, 1.0};
+        const float shininess = 10.0;
+        // const float screenGamma = 2.2; // Assume the monitor is calibrated to the sRGB color space
         void Blinn_Phone() {
             Vec3f normal = normalize(inNormal);
             Vec3f lightDir = lightPos - inPosView;
@@ -171,8 +171,8 @@ namespace Device {
 
             //Vec3f diffuseLinear = cross(diffuseColor * lambertian, lightColor * lightPower) / distance;
             //Vec3f specularLinear = cross(specColor * specular, lightColor * lightPower) / distance;
-            Vec3f diffuseLinear = lambertian * lightColor * lightPower / distance;
-            Vec3f specularLinear = specular * lightColor * lightPower / distance;
+            Vec3f diffuseLinear = lambertian * diffuseColor * lightPower / distance;
+            Vec3f specularLinear = specular * specColor * lightPower / distance;
 
             outColor = colorLinear + diffuseLinear + specularLinear;
 

@@ -10,13 +10,6 @@ namespace Device {
 
     class Rasterizer: public Comp
     {
-    public:
-        struct Triangle
-        {
-            U32 x, y;
-            BaryCentricCoff coff;
-        };
-
     protected:
         U32 m_width;
         U32 m_height;
@@ -29,7 +22,7 @@ namespace Device {
 
         U32 m_triVtxIndices[3];
         U32 m_triIndex;
-        std::vector<Triangle> m_triPending;
+        std::vector<BaryCentricCoff> m_triPending;
         U32 m_triProcessed;
 
     public:
@@ -45,7 +38,7 @@ namespace Device {
 
         U32 getHeight() const;
 
-        std::vector<Triangle> rasterizeTriangle(Vec4f const& va, Vec4f const& vb, Vec4f const& vc);
+        std::vector<BaryCentricCoff> rasterizeTriangle(Vec4f const& va, Vec4f const& vb, Vec4f const& vc);
 
         void rasterizeLine(Vec2f const& va, Vec2f const& b);
 

@@ -41,9 +41,9 @@ namespace Device {
         return m_height;
     }
 
-    std::vector<Rasterizer::Triangle> Rasterizer::rasterizeTriangle(Vec4f const& va, Vec4f const& vb, Vec4f const& vc)
+    std::vector<BaryCentricCoff> Rasterizer::rasterizeTriangle(Vec4f const& va, Vec4f const& vb, Vec4f const& vc)
     {
-        std::vector<Triangle> output;
+        std::vector<BaryCentricCoff> output;
 
         // setup triangle
         Triangle2D const triangle = setupTriangle(*(Vec2f*)&va, *(Vec2f*)&vb, *(Vec2f*)&vc);
@@ -74,19 +74,9 @@ namespace Device {
                 if (insideTriangle(triangle, pixel))
                 {
                     // Prepare(interpolate) pixel input information and pass to pixel shader for rendering.
-                    output.push_back(Triangle{});
-                    Triangle& rasterInfo = output.back();
-
-                    rasterInfo.x = x;
-                    rasterInfo.y = y;
-                    rasterInfo.coff = calcBaryCentricCoordinates(triangle, pixel);
-
-                    // debug
-                    //{
-                    //    BaryCentricCoff const& coff = rasterInfo.coff;
-                    //    Vec2f pos = interpolate(va, coff.u, vb, coff.v, vc, coff.w);
-                    //    std::cout << U32(pos.x * width) << " " << U32(pos.y * m_height) << " :" << std::endl;
-                    //}
+                    output.push_back(BaryCentricCoff{});
+                    BaryCentricCoff& coff = output.back();
+                    coff = calcBaryCentricCoordinates(triangle, pixel);
                 }
             }
         }
@@ -182,8 +172,7 @@ namespace Device {
     void Rasterizer::produceOneOutput()
     {
         assert(m_triProcessed < m_triPending.size());
-        Rasterizer::Triangle const& rasterInfo = m_triPending[m_triProcessed++];
-        BaryCentricCoff const& coff = rasterInfo.coff;
+        BaryCentricCoff const& coff = m_triPending[m_triProcessed++];
 
         // TODO: move this after ps and vsout binding.
         LinearStruct const& structure = m_vsOutBuffer.getElementStruct();
