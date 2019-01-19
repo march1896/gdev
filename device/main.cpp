@@ -224,6 +224,7 @@ void test_fixed_pipeline()
     Shader psShader = loadPS_Simple();
 
     // setup vs constants.
+    Mat44f matWorldView;
     {
         // transformation matrices
         //Vec3f camPos = {0.0f, 0.0f, 1.0f};
@@ -232,9 +233,9 @@ void test_fixed_pipeline()
         // Mat44f matWorldView = calcViewMatrix(camPos, camUp, camRight);
 
         Vec3f targetPos{0.0, 0.0, 0.0};
-        Vec3f camPos{3.0, 3.0, 5.0};
+        Vec3f camPos{3.0, 2.0, 5.0};
         Vec3f camUp{0.0, 1.0, 0.0};
-        Mat44f matWorldView = lookAtViewMatrix(targetPos, camPos, camUp);
+        matWorldView = lookAtViewMatrix(targetPos, camPos, camUp);
 
         //float orthWidth = 3.0f;
         //float orthHeight = orthWidth * HEIGHT / WIDTH;
@@ -254,6 +255,25 @@ void test_fixed_pipeline()
         //Mat44f matViewIT;
     }
 
+    // setup ps constants
+    {
+        Vec3f* pLightPos = (Vec3f*)psShader.getConstantAddr("cLightPos");
+        Vec3f* pLightAmbient = (Vec3f*)psShader.getConstantAddr("cLightAmbient");
+        Vec3f* pLightDiffuse = (Vec3f*)psShader.getConstantAddr("cLightDiffuse");
+        Vec3f* pLightSpecular = (Vec3f*)psShader.getConstantAddr("cLightSpecular");
+        float* pLightPower  = (float*)psShader.getConstantAddr("cLightPower");
+        float* pLightShininess  = (float*)psShader.getConstantAddr("cLightShininess");
+
+        Vec4f lightPos = matWorldView * Vec4f{13.0, 13.0, 13.0, 1.0};
+
+        *pLightPos = {lightPos.x, lightPos.y, lightPos.z};
+        *pLightAmbient = {0.05, 0.05, 0.05};
+        *pLightDiffuse = {1.0, 0.0, 0.0};
+        *pLightSpecular = {1.0, 1.0, 1.0};
+        *pLightPower = 220.0;
+        *pLightShininess = 10.0;
+    }
+
     device.setVSProgram(vsShader);
     device.setPSProgram(psShader);
 
@@ -263,7 +283,7 @@ void test_fixed_pipeline()
     std::vector<U32> indices;
     // setup geometries
     {
-        Model::genSphere(vertices, normals, texCoords, indices);
+        Model::genCube(vertices, normals, texCoords, indices);
 
         device.setVertexBufferChannel(Semantic::Position0, (U8*)vertices.data(), 0, sizeof(Vec3f));
         // device.setVertexBufferChannel(Semantic::Color0, (U8*)normals.data(), 0, sizeof(Vec3f));

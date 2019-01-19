@@ -92,17 +92,17 @@ namespace Device {
     {
         Shader shader;
 
-        shader.addSymbol(Shader::Input, std::string("position"), Type::FLOAT3, Semantic::Position0, (U8*)&VSSimple::inPosition);
-        shader.addSymbol(Shader::Input, std::string("normal"),   Type::FLOAT3, Semantic::Normal0, (U8*)&VSSimple::inNormal);
-        shader.addSymbol(Shader::Input, std::string("color"),    Type::FLOAT3, Semantic::Color0, (U8*)&VSSimple::inColor);
+        shader.addSymbol(Shader::Input    , std::string("position")       , Type::FLOAT3   , Semantic::Position0   , (U8*)&VSSimple::inPosition);
+        shader.addSymbol(Shader::Input    , std::string("normal")         , Type::FLOAT3   , Semantic::Normal0     , (U8*)&VSSimple::inNormal);
+        shader.addSymbol(Shader::Input    , std::string("color")          , Type::FLOAT3   , Semantic::Color0      , (U8*)&VSSimple::inColor);
 
-        shader.addSymbol(Shader::Output, std::string("posClip"), Type::FLOAT4, Semantic::SV_Position, (U8*)&VSSimple::outPosClip);
-        shader.addSymbol(Shader::Output, std::string("posView"), Type::FLOAT3, Semantic::Position0, (U8*)&VSSimple::outPosView);
-        shader.addSymbol(Shader::Output, std::string("normal"),   Type::FLOAT3, Semantic::Normal0, (U8*)&VSSimple::outNormal);
-        shader.addSymbol(Shader::Output, std::string("color"),    Type::FLOAT3, Semantic::Color0, (U8*)&VSSimple::outColor);
+        shader.addSymbol(Shader::Output   , std::string("posClip")        , Type::FLOAT4   , Semantic::SV_Position , (U8*)&VSSimple::outPosClip);
+        shader.addSymbol(Shader::Output   , std::string("posView")        , Type::FLOAT3   , Semantic::Position0   , (U8*)&VSSimple::outPosView);
+        shader.addSymbol(Shader::Output   , std::string("normal")         , Type::FLOAT3   , Semantic::Normal0     , (U8*)&VSSimple::outNormal);
+        shader.addSymbol(Shader::Output   , std::string("color")          , Type::FLOAT3   , Semantic::Color0      , (U8*)&VSSimple::outColor);
 
-        shader.addSymbol(Shader::Constant, std::string("mWorldView"), Type::FLOAT4X4, Semantic{}, (U8*)&VSSimple::mWorldView);
-        shader.addSymbol(Shader::Constant, std::string("mWorldViewProj"), Type::FLOAT4X4, Semantic{}, (U8*)&VSSimple::mWorldViewProj);
+        shader.addSymbol(Shader::Constant , std::string("mWorldView")     , Type::FLOAT4X4 , Semantic{}            , (U8*)&VSSimple::mWorldView);
+        shader.addSymbol(Shader::Constant , std::string("mWorldViewProj") , Type::FLOAT4X4 , Semantic{}            , (U8*)&VSSimple::mWorldViewProj);
 
         shader.setEntry(&VSSimple::vs_main);
 
@@ -119,8 +119,13 @@ namespace Device {
         SHADER_OUT Vec3f outPosition;
         SHADER_OUT Vec3f outColor;
 
-        // TODO: bind this constant
-        // SHADER_CONST Vec3f cLightDir;
+        SHADER_CONST Vec3f cLightPos;
+        SHADER_CONST Vec3f cLightAmbient;
+        SHADER_CONST Vec3f cLightDiffuse;
+        SHADER_CONST Vec3f cLightSpecular;
+        SHADER_CONST float cLightPower;
+        SHADER_CONST float cLightShininess;
+        // SHADER_CONST float screenGamma; // Assume the monitor is calibrated to the sRGB color space
 
         static void Blinn_Phone();
         // [ref](https://en.wikipedia.org/wiki/Blinn%E2%80%93Phong_shading_model)
@@ -134,18 +139,11 @@ namespace Device {
             Blinn_Phone();
         }
 
-        // TODO: move this to shader constants.
-        const Vec3f lightPos{8.0, 8.0, 10.0};
-        // const Vec3f lightColor{1.0, 1.0, 1.0};
-        const float lightPower = 160.0;
-        const Vec3f ambientColor{0.05, 0.05, 0.05};
-        const Vec3f diffuseColor{1.0, 0.0, 0.0};
-        const Vec3f specColor{1.0, 1.0, 1.0};
-        const float shininess = 10.0;
-        // const float screenGamma = 2.2; // Assume the monitor is calibrated to the sRGB color space
-        void Blinn_Phone() {
+        static void Blinn_Phone() 
+        {
             Vec3f normal = normalize(inNormal);
-            Vec3f lightDir = lightPos - inPosView;
+            Vec3f lightDir = cLightPos - inPosView;
+
             float distance = lightDir.length();
             distance = distance * distance;
             lightDir.normalize();
@@ -160,23 +158,20 @@ namespace Device {
                 Vec3f halfDir = normalize(lightDir + viewDir);
 
                 float specAngle = std::max(dot(halfDir, normal), 0.0f);
-                specular = pow(specAngle, shininess);
+                specular = pow(specAngle, cLightShininess);
             }
             else
             {
                 // This should not happen if back face is culled.
-                // std::cout << inPosView << " : " << lightPos << std::endl;
+                // std::cout << "TODO:" << std::endl;
             }
-            Vec3f colorLinear = ambientColor;
-
-            //Vec3f diffuseLinear = cross(diffuseColor * lambertian, lightColor * lightPower) / distance;
-            //Vec3f specularLinear = cross(specColor * specular, lightColor * lightPower) / distance;
-            Vec3f diffuseLinear = lambertian * diffuseColor * lightPower / distance;
-            Vec3f specularLinear = specular * specColor * lightPower / distance;
+            Vec3f colorLinear = cLightAmbient;
+            Vec3f diffuseLinear = lambertian * cLightDiffuse * cLightPower / distance;
+            Vec3f specularLinear = specular * cLightSpecular * cLightPower / distance;
 
             outColor = colorLinear + diffuseLinear + specularLinear;
 
-            // apply gamma correction (assume ambientColor, diffuseColor and specColor
+            // apply gamma correction (assume cLightAmbient, cLightDiffuse and cLightSpecular
             // have been linearized, i.e. have no gamma correction in them)
             // Vec3f colorGammaCorrected = pow(colorLinear, Vec3f(1.0/screenGamma));
 
@@ -189,13 +184,20 @@ namespace Device {
     {
         Shader shader;
 
-        shader.addSymbol(Shader::Input, std::string("posClip"),  Type::FLOAT4, Semantic::SV_Position, (U8*)&PSSimple::inPosClip);
-        shader.addSymbol(Shader::Input, std::string("posView"),  Type::FLOAT4, Semantic::Position0, (U8*)&PSSimple::inPosView);
-        shader.addSymbol(Shader::Input, std::string("normal"),   Type::FLOAT3, Semantic::Normal0, (U8*)&PSSimple::inNormal);
-        shader.addSymbol(Shader::Input, std::string("color"),    Type::FLOAT3, Semantic::Color0, (U8*)&PSSimple::inColor);
+        shader.addSymbol(Shader::Input    , std::string("posClip")         , Type::FLOAT4 , Semantic::SV_Position , (U8*)&PSSimple::inPosClip);
+        shader.addSymbol(Shader::Input    , std::string("posView")         , Type::FLOAT3 , Semantic::Position0   , (U8*)&PSSimple::inPosView);
+        shader.addSymbol(Shader::Input    , std::string("normal")          , Type::FLOAT3 , Semantic::Normal0     , (U8*)&PSSimple::inNormal);
+        shader.addSymbol(Shader::Input    , std::string("color")           , Type::FLOAT3 , Semantic::Color0      , (U8*)&PSSimple::inColor);
 
-        shader.addSymbol(Shader::Output, std::string("position"), Type::FLOAT3, Semantic::SV_Position, (U8*)&PSSimple::outPosition);
-        shader.addSymbol(Shader::Output, std::string("color"),    Type::FLOAT3, Semantic::SV_Target, (U8*)&PSSimple::outColor);
+        shader.addSymbol(Shader::Output   , std::string("position")        , Type::FLOAT3 , Semantic::SV_Position , (U8*)&PSSimple::outPosition);
+        shader.addSymbol(Shader::Output   , std::string("color")           , Type::FLOAT3 , Semantic::SV_Target   , (U8*)&PSSimple::outColor);
+
+        shader.addSymbol(Shader::Constant , std::string("cLightPos")       , Type::FLOAT3  , Semantic{}           , (U8*)&PSSimple::cLightPos);
+        shader.addSymbol(Shader::Constant , std::string("cLightAmbient")   , Type::FLOAT3  , Semantic{}           , (U8*)&PSSimple::cLightAmbient);
+        shader.addSymbol(Shader::Constant , std::string("cLightDiffuse")   , Type::FLOAT3  , Semantic{}           , (U8*)&PSSimple::cLightDiffuse);
+        shader.addSymbol(Shader::Constant , std::string("cLightSpecular")  , Type::FLOAT3  , Semantic{}           , (U8*)&PSSimple::cLightSpecular);
+        shader.addSymbol(Shader::Constant , std::string("cLightPower")     , Type::FLOAT   , Semantic{}           , (U8*)&PSSimple::cLightPower);
+        shader.addSymbol(Shader::Constant , std::string("cLightShininess") , Type::FLOAT   , Semantic{}           , (U8*)&PSSimple::cLightShininess);
 
         shader.setEntry(&PSSimple::ps_main);
 
