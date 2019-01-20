@@ -248,14 +248,13 @@ void test_fixed_pipeline()
     // setup vs constants.
 
     // setup ps constants
+    Vec3f* pLightPos = (Vec3f*)psShader.getConstantAddr("cLightPos");
+    Vec3f* pLightAmbient = (Vec3f*)psShader.getConstantAddr("cLightAmbient");
+    Vec3f* pLightDiffuse = (Vec3f*)psShader.getConstantAddr("cLightDiffuse");
+    Vec3f* pLightSpecular = (Vec3f*)psShader.getConstantAddr("cLightSpecular");
+    float* pLightPower  = (float*)psShader.getConstantAddr("cLightPower");
+    float* pLightShininess  = (float*)psShader.getConstantAddr("cLightShininess");
     {
-        Vec3f* pLightPos = (Vec3f*)psShader.getConstantAddr("cLightPos");
-        Vec3f* pLightAmbient = (Vec3f*)psShader.getConstantAddr("cLightAmbient");
-        Vec3f* pLightDiffuse = (Vec3f*)psShader.getConstantAddr("cLightDiffuse");
-        Vec3f* pLightSpecular = (Vec3f*)psShader.getConstantAddr("cLightSpecular");
-        float* pLightPower  = (float*)psShader.getConstantAddr("cLightPower");
-        float* pLightShininess  = (float*)psShader.getConstantAddr("cLightShininess");
-
         Vec4f lightPosWorld = Vec4f{8.0, 8.0, 5.0, 1.0};
         Vec4f lightPos = matView * lightPosWorld;
 
@@ -285,10 +284,11 @@ void test_fixed_pipeline()
             matWorld.make_identity();
             transform(matWorld, {-1.0f, 0.0f, 0.0f});
 
-            Mat44f matWorldViewProj = matProj * (matView * matWorld);
+            Mat44f matWorldView = matView * matWorld;
+            Mat44f matWorldViewProj = matProj * matWorldView;
 
             Mat44f* pMatWorldView = (Mat44f*)vsShader.getConstantAddr("mWorldView");
-            *pMatWorldView = matView;
+            *pMatWorldView = matWorldView;
 
             Mat44f* pMatWorldViewProj = (Mat44f*)vsShader.getConstantAddr("mWorldViewProj");
             *pMatWorldViewProj = matWorldViewProj;
@@ -323,13 +323,17 @@ void test_fixed_pipeline()
             matWorld.make_identity();
             transform(matWorld, {+1.0f, 0.0f, 0.0f});
 
-            Mat44f matWorldViewProj = matProj * (matView * matWorld);
+            Mat44f matWorldView = matView * matWorld;
+            Mat44f matWorldViewProj = matProj * matWorldView;
 
             Mat44f* pMatWorldView = (Mat44f*)vsShader.getConstantAddr("mWorldView");
-            *pMatWorldView = matView;
+            *pMatWorldView = matWorldView;
 
             Mat44f* pMatWorldViewProj = (Mat44f*)vsShader.getConstantAddr("mWorldViewProj");
             *pMatWorldViewProj = matWorldViewProj;
+
+            // TODO: model color instead of light color?
+            *pLightDiffuse = {0.0, 0.0, 1.0};
         }
 
         device.setVertexBufferChannel(Semantic::Position0, (U8*)vertices.data(), 0, sizeof(Vec3f));

@@ -12,7 +12,7 @@ namespace Device { namespace Model {
 
     void genCuoid(std::vector<Vec3f>& vertices, std::vector<Vec3f>& normals, std::vector<Vec2f>& texCoords, std::vector<U32>& indices, float wx=1.5f, float wy=1.5f, float wz=1.5f);
 
-    void genSphere(std::vector<Vec3f>& vertices, std::vector<Vec3f>& normals, std::vector<Vec2f>& texCoords, std::vector<U32>& indices, float radius=1.0f, U32 sectorCount=20, U32 stackCount=20);
+    void genSphere(std::vector<Vec3f>& vertices, std::vector<Vec3f>& normals, std::vector<Vec2f>& texCoords, std::vector<U32>& indices, float radius=1.0f, U32 sectorCount=30, U32 stackCount=30);
 
     void genTeapot(std::vector<Vec3f>& vertices, std::vector<Vec3f>& normals, std::vector<Vec2f>& texCoords, std::vector<U32>& indices);
 } // namespace Model

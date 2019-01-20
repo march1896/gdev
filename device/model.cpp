@@ -279,49 +279,46 @@ namespace Device { namespace Model {
             }
         }
 
-        //std::vector<std::vector<Vec3f>> vertexNormals;
-        //vertexNormals.resize(vertexBuffer.size());
-        //// generate normal for faces.
-        //for (U32 i = 0; i < indexBuffer.size(); i += 3)
-        //{
-        //    U32 ia = indexBuffer[i];
-        //    U32 ib = indexBuffer[i+1];
-        //    U32 ic = indexBuffer[i+2];
+        std::vector<std::vector<Vec3f>> vertexNormals;
+        vertexNormals.resize(vertices.size());
+        // generate normal for faces.
+        for (U32 i = 0; i < indices.size(); i += 3)
+        {
+            U32 ia = indices[i];
+            U32 ib = indices[i+1];
+            U32 ic = indices[i+2];
 
-        //    Vec3f va = vertexBuffer[ia].position;
-        //    Vec3f vb = vertexBuffer[ib].position;
-        //    Vec3f vc = vertexBuffer[ic].position;
+            Vec3f va = vertices[ia];
+            Vec3f vb = vertices[ib];
+            Vec3f vc = vertices[ic];
 
-        //    Vec3f ab = vb - va;
-        //    Vec3f bc = vc - vb;
-        //    Vec3f ca = va - vc;
+            Vec3f ab = vb - va;
+            Vec3f bc = vc - vb;
+            Vec3f ca = va - vc;
 
-        //    Vec3f nb = cross(ab, bc);
-        //    Vec3f nc = cross(bc, ca);
-        //    Vec3f na = cross(ca, ab);
+            Vec3f nb = cross(ab, bc);
+            Vec3f nc = cross(bc, ca);
+            Vec3f na = cross(ca, ab);
 
-        //    vertexNormals[ia].push_back(na);
-        //    vertexNormals[ib].push_back(nb);
-        //    vertexNormals[ic].push_back(nc);
-        //}
+            vertexNormals[ia].push_back(na);
+            vertexNormals[ib].push_back(nb);
+            vertexNormals[ic].push_back(nc);
+        }
 
-        //for (U32 i = 0; i < vertexBuffer.size(); i ++)
-        //{
-        //    Vec3f n{0.0f, 0.0f, 0.0f};
-        //    for (U32 j = 0; j < vertexNormals[i].size(); j ++)
-        //    {
-        //        n = n + vertexNormals[i][j];
-        //    }
+        for (U32 i = 0; i < vertices.size(); i ++)
+        {
+            Vec3f n{0.0f, 0.0f, 0.0f};
+            for (U32 j = 0; j < vertexNormals[i].size(); j ++)
+            {
+                n = n + vertexNormals[i][j];
+            }
 
-        //    vertexBuffer[i].normal.x = n.x / vertexNormals[i].size();
-        //    vertexBuffer[i].normal.y = n.y / vertexNormals[i].size();
-        //    vertexBuffer[i].normal.z = n.z / vertexNormals[i].size();
+            normals[i] = n / (float)vertexNormals[i].size();
+            // std::cout << vertices[i].normal << std::endl;
+            std::cout << vertexNormals[i].size() << std::endl;
 
-        //    // std::cout << vertexBuffer[i].normal << std::endl;
-        //    std::cout << vertexNormals[i].size() << std::endl;
-
-        //    vertexBuffer[i].normal.normalize();
-        //}
+            normals[i].normalize();
+        }
     }
 } // namespace Model
 } // namepsace Device
