@@ -300,6 +300,10 @@ namespace Device { namespace Model {
             Vec3f nc = cross(bc, ca);
             Vec3f na = cross(ca, ab);
 
+            na.normalize();
+            nb.normalize();
+            nc.normalize();
+
             vertexNormals[ia].push_back(na);
             vertexNormals[ib].push_back(nb);
             vertexNormals[ic].push_back(nc);

@@ -82,6 +82,7 @@ namespace Device {
 
             outColor = inColor;
 
+            // TODO: direct Mat44f * Vec3f?
             Vec4f normal = {inNormal.x, inNormal.y, inNormal.z, 0};
             normal = mWorldView * normal;
             outNormal = {normal.x, normal.y, normal.z};
