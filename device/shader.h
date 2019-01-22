@@ -34,7 +34,7 @@ namespace Device {
         struct Symbol
         {
             std::string name;
-            Type type;
+            BuiltinType type;
             Semantic semantic;
             U8* addr;
         };
@@ -46,7 +46,7 @@ namespace Device {
         MainEntry m_entryFunc;
 
     public:
-        void addSymbol(Section section, std::string const& name, Type const& type, Semantic const& semantic, U8* addr);
+        void addSymbol(Section section, std::string const& name, BuiltinType const& type, Semantic const& semantic, U8* addr);
 
         void setEntry(MainEntry mainProc);
 
@@ -54,7 +54,7 @@ namespace Device {
 
         Symbol getSymbol(Section, std::string const& name) const;
 
-        Type getConstantType(std::string const& name) const;
+        BuiltinType getConstantType(std::string const& name) const;
 
         U8* getConstantAddr(std::string const& name) const;
 

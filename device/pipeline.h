@@ -22,7 +22,7 @@ namespace Device {
         for (U32 portIndex = 0; portIndex < numPorts; ++ portIndex)
         {
             Semantic const& semantic = comp.getSemantic(io, portIndex);
-            Type const& type = comp.getType(io, portIndex);
+            BuiltinType const& type = comp.getType(io, portIndex);
             stream.addChannel(semantic, type);
         }
     }

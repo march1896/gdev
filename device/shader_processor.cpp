@@ -47,8 +47,8 @@ namespace Device {
         // copy to shader input
         for (U32 portIdx = 0; portIdx < m_values[Input].size(); ++portIdx)
         {
-            Type& type = m_types[Input][portIdx];
-            Value& value = m_values[Input][portIdx];
+            BuiltinType const& type = m_types[Input][portIdx];
+            BuiltinValueRef const& value = m_values[Input][portIdx];
             U8* pShaderInput = m_shaderInputAddrs[portIdx];
             U8* pCompInPort = value.read();
             if (pShaderInput != nullptr && pCompInPort != nullptr)
@@ -62,8 +62,8 @@ namespace Device {
         // copy to shader output
         for (U32 portIdx = 0; portIdx < m_values[Output].size(); ++portIdx)
         {
-            Type& type = m_types[Output][portIdx];
-            Value& value = m_values[Output][portIdx];
+            BuiltinType const& type = m_types[Output][portIdx];
+            BuiltinValueRef& value = m_values[Output][portIdx];
             U8* pShaderOutput = m_shaderOutputAddrs[portIdx];
             U8* pCompOutPort = value.read();
             if (pShaderOutput != nullptr && pCompOutPort)

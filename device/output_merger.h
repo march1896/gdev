@@ -20,8 +20,8 @@ namespace Device {
         Texture::Texture2D m_depthTarget;
         // TODO: stencil target?
 
-        Value* m_inPosition;
-        Value* m_inColor;
+        BuiltinValueRef* m_inPosition;
+        BuiltinValueRef* m_inColor;
 
     public:
         OutputMerger();

@@ -2,6 +2,52 @@
 
 #include "rasterizer.h"
 
+namespace {
+    using namespace Device;
+
+    // Plane equation.
+    // P(x, y, z) = a*x + b*y + c*z + d;
+    struct TrianglePlaneMeta
+    {
+        typedef StructType Type;
+        typedef StructValueRef Value;
+
+        Type structure;
+        //Value A;
+        //Value B;
+        //Value C;
+        //Value D;
+        U8* m_storage;
+
+        TrianglePlaneMeta(Type const& t, Value const& a, Value const& b, Value const& c)
+            : structure(t)
+            //, A(&structure, nullptr)
+            //, B(&structure, nullptr)
+            //, C(&structure, nullptr)
+            //, D(&structure, nullptr)
+        {
+            m_storage = (U8*)malloc(structure.getSize() * 4);
+
+            //Value A{&structure, m_storage + structure.getSize() * 0};
+            //Value B{&structure, m_storage + structure.getSize() * 1};
+            //Value C{&structure, m_storage + structure.getSize() * 2};
+            //Value D{&structure, m_storage + structure.getSize() * 3};
+
+            for (U32 fieldIdx = 0; fieldIdx < structure.numFields(); ++fieldIdx)
+            {
+
+            }
+
+        }
+
+        ~TrianglePlaneMeta()
+        {
+            assert(m_storage);
+            free(m_storage);
+        }
+    };
+}
+
 namespace Device {
 
     Rasterizer::Rasterizer()
@@ -9,7 +55,7 @@ namespace Device {
         , m_height(1)
     {
         // raster input is connected to primitive assember output.
-        addIOPort(Input, std::string("vtx_index"), Type::UINT, Semantic::SV_VertexIndex);
+        addIOPort(Input, std::string("vtx_index"), BuiltinType::UINT, Semantic::SV_VertexIndex);
         m_inVtxIdx = getValuePtr(Input, "vtx_index");
 
         m_triIndex = 0;
@@ -41,12 +87,13 @@ namespace Device {
         return m_height;
     }
 
-    std::vector<BaryCentricCoff> Rasterizer::rasterizeTriangle(Vec4f const& va, Vec4f const& vb, Vec4f const& vc)
+    // TODO: implement ddx/ddy
+    std::vector<Vec2f> Rasterizer::rasterizeTriangle(Vec4f const& va, Vec4f const& vb, Vec4f const& vc)
     {
-        std::vector<BaryCentricCoff> output;
+        std::vector<Vec2f> pixels;
 
         // setup triangle
-        Triangle2D const triangle = setupTriangle(*(Vec2f*)&va, *(Vec2f*)&vb, *(Vec2f*)&vc);
+        m_curTriangle = setupTriangle(*(Vec2f*)&va, *(Vec2f*)&vb, *(Vec2f*)&vc);
 
         // setup NDC(normalized device coordinates) bounding box.
         AABB<float> ndcBox;
@@ -70,18 +117,16 @@ namespace Device {
             for (int y = ymin / 2 * 2 + 1; y < ymax; y += 2)
             {
                 Vec2f pixel{float(x)/width, float(y)/height};
-                // TODO: near/far clipping?
-                if (insideTriangle(triangle, pixel))
+
+                // TODO: near/far clipping? this can only be done after interpolation.
+                if (insideTriangle(m_curTriangle, pixel))
                 {
-                    // Prepare(interpolate) pixel input information and pass to pixel shader for rendering.
-                    output.push_back(BaryCentricCoff{});
-                    BaryCentricCoff& coff = output.back();
-                    coff = calcBaryCentricCoordinates(triangle, pixel);
+                    pixels.push_back(pixel);
                 }
             }
         }
 
-        return output;
+        return pixels;
     }
 
     void Rasterizer::rasterizeLine(Vec2f const& va, Vec2f const& b)
@@ -95,7 +140,7 @@ namespace Device {
     {
         m_vsOutBuffer = StreamBuffer{fifoStream};
 
-        LinearStruct const& structure = m_vsOutBuffer.getElementStruct();
+        StructType const& structure = m_vsOutBuffer.getElementStruct();
         m_vsOutPositionChannel = structure.getFieldIndex(Semantic::SV_Position);
 
         if (m_vsOutPositionChannel == structure.numFields())
@@ -104,10 +149,10 @@ namespace Device {
             assert(0);
         }
 
-        // do perspective divide here.
+        // do perspective divide.
         for (U32 bufIdx = 0; bufIdx < m_vsOutBuffer.getLength(); ++ bufIdx)
         {
-            Vec4f& vPos = *(Vec4f*)m_vsOutBuffer.getElement(bufIdx).getData(m_vsOutPositionChannel);
+            Vec4f& vPos = *(Vec4f*)m_vsOutBuffer.getElement(bufIdx).getFieldAddr(m_vsOutPositionChannel);
 
             vPos.x /= vPos.w;
             vPos.y /= vPos.w;
@@ -128,7 +173,7 @@ namespace Device {
         for (U32 portIdx = 0; portIdx < numPorts; ++portIdx)
         {
             Semantic const& semantic = nextComp.getSemantic(Comp::Input, portIdx);
-            Type const& type = nextComp.getType(Comp::Input, portIdx);
+            BuiltinType const& type = nextComp.getType(Comp::Input, portIdx);
             std::string const& name = nextComp.getName(Comp::Input, portIdx);
 
             addIOPort(Comp::Output, name, type, semantic);
@@ -153,9 +198,9 @@ namespace Device {
         {
             assert(!hasPendingOutput());
 
-            Vec4f* va = (Vec4f*)m_vsOutBuffer.getElement(m_triVtxIndices[0]).getData(m_vsOutPositionChannel);
-            Vec4f* vb = (Vec4f*)m_vsOutBuffer.getElement(m_triVtxIndices[1]).getData(m_vsOutPositionChannel);
-            Vec4f* vc = (Vec4f*)m_vsOutBuffer.getElement(m_triVtxIndices[2]).getData(m_vsOutPositionChannel);
+            Vec4f* va = (Vec4f*)m_vsOutBuffer.getElement(m_triVtxIndices[0]).getFieldAddr(m_vsOutPositionChannel);
+            Vec4f* vb = (Vec4f*)m_vsOutBuffer.getElement(m_triVtxIndices[1]).getFieldAddr(m_vsOutPositionChannel);
+            Vec4f* vc = (Vec4f*)m_vsOutBuffer.getElement(m_triVtxIndices[2]).getFieldAddr(m_vsOutPositionChannel);
 
             m_triPending = rasterizeTriangle(*va, *vb, *vc);
             m_triProcessed = 0;
@@ -172,10 +217,12 @@ namespace Device {
     void Rasterizer::produceOneOutput()
     {
         assert(m_triProcessed < m_triPending.size());
-        BaryCentricCoff const& coff = m_triPending[m_triProcessed++];
+
+        Vec2f pixel = m_triPending[m_triProcessed++];
+        BaryCentricCoff const& coff = calcBaryCentricCoordinates(m_curTriangle, pixel);
 
         // TODO: move this after ps and vsout binding.
-        LinearStruct const& structure = m_vsOutBuffer.getElementStruct();
+        StructType const& structure = m_vsOutBuffer.getElementStruct();
 
         // Note: assume rasterizer out ports are bound.
         // Note: rasterizer out ports are dynamically constructed, which matchs psIn
@@ -186,18 +233,18 @@ namespace Device {
 
         for (U32 outPortIdx = 0; outPortIdx < numOutPorts; ++outPortIdx)
         {
-            Type const& type = getType(Comp::Output, outPortIdx);
+            BuiltinType const& type = getType(Comp::Output, outPortIdx);
 
             // TODO: cache below values
-            Value va{type}, vb{type}, vc{type};
+            BuiltinValueRef va{type}, vb{type}, vc{type};
             U32 channel = structure.getFieldIndex(getSemantic(Comp::Output, outPortIdx));
 
-            va.bind(element_a.getData(channel));
-            vb.bind(element_b.getData(channel));
-            vc.bind(element_c.getData(channel));
+            va.bind(element_a.getFieldAddr(channel));
+            vb.bind(element_b.getFieldAddr(channel));
+            vc.bind(element_c.getFieldAddr(channel));
 
-            Value* out = getValuePtr(Comp::Output, outPortIdx);
-            out->interpolate(&va, coff.u, &vb, coff.v, &vc, coff.w);
+            BuiltinValueRef* out = getValuePtr(Comp::Output, outPortIdx);
+            interpolate_inplace(*out, va, coff.u, vb, coff.v, vc, coff.w);
 
             // debug
             //{

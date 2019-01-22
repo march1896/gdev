@@ -7,9 +7,9 @@ namespace Device {
     class PrimitiveAssembler: public Comp
     {
     protected:
-        Value* m_inIndex;
+        BuiltinValueRef* m_inIndex;
 
-        Value* m_outIndex;
+        BuiltinValueRef* m_outIndex;
 
     public:
         PrimitiveAssembler();

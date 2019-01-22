@@ -8,94 +8,11 @@
 #include <iostream>
 
 #include "vmath.h"
+#include "value.h"
 #include "semantic.h"
 #include "texture.h"
 
 namespace Device {
-
-    // TODO: move this to standalong file?
-    enum class Type
-    {
-        UNKNOWN,
-
-        FLOAT,
-        FLOAT2,
-        FLOAT3,
-        FLOAT4,
-
-        FLOAT4X4,
-
-        HALF,
-
-        DOUBLE,
-
-        INT,
-
-        Sampler2D,
-
-        Texture2D,
-
-        UINT,
-    };
-
-    U32 SizeOf(Type const& type);
-
-    template <Type type>
-    struct TypeTrait {
-        // TODO: make default unknown
-        using CppType = void*;
-        static constexpr U32 Width = sizeof(void*);
-    };
-
-#define def_type_trait(elementType, cppType) \
-    template <> \
-    struct TypeTrait<elementType> { \
-        using CppType = cppType; \
-        static constexpr U32 Width = sizeof(cppType); \
-    };
-
-    def_type_trait(Type::FLOAT,  float)
-    def_type_trait(Type::FLOAT2, Vec2f)
-    def_type_trait(Type::FLOAT3, Vec3f)
-    def_type_trait(Type::FLOAT4, Vec4f)
-    def_type_trait(Type::FLOAT4X4, Mat44f)
-    def_type_trait(Type::UINT,  unsigned int)
-    def_type_trait(Type::INT, int)
-    def_type_trait(Type::HALF, short)
-    def_type_trait(Type::Sampler2D, Texture::Sampler2D)
-    def_type_trait(Type::Texture2D, Texture::Texture2D)
-
-#undef def_type_trait
-
-    class Value
-    {
-    protected:
-        Type const m_type;
-        U8* m_addr;
-
-    public:
-        Value(Type const& type)
-            : m_type(type)
-            , m_addr(nullptr)
-        {}
-
-        inline Type type() const { return m_type; }
-
-        inline U8* read() const { return m_addr; }
-
-        template <typename T>
-        inline T readAs() const { return *reinterpret_cast<T*>(m_addr); }
-
-        inline void write(U8* new_val) { std::memcpy(m_addr, new_val, SizeOf(m_type)); }
-
-        inline void bind(U8* addr) { m_addr = addr; }
-
-        void interpolate(Value const* a, float u, Value const* b, float v);
-
-        void interpolate(Value const* a, float u, Value const* b, float v, Value const* c, float w);
-    };
-
-    std::ostream &operator<<(std::ostream &stream, Value const& ob);
 
     class Comp
     {
@@ -108,8 +25,8 @@ namespace Device {
         };
 
     protected:
-        typedef std::vector<Type> Types;
-        typedef std::vector<Value> Values;
+        typedef std::vector<BuiltinType> Types;
+        typedef std::vector<BuiltinValueRef> Values;
         typedef std::vector<Semantic> Semantics;
         typedef std::vector<std::string> Symbols;
 
@@ -132,7 +49,7 @@ namespace Device {
         // IO interfaces, start
         //
         // Return a unique location of this io port
-        U32 addIOPort(IOType io, std::string const& name, Type const& type, Semantic const& semantic);
+        U32 addIOPort(IOType io, std::string const& name, BuiltinType const& type, Semantic const& semantic);
 
         U32 getNumPorts(IOType io) const;
 
@@ -148,11 +65,11 @@ namespace Device {
 
         bool isRequired(IOType io, std::string const& name) const;
 
-        Type getType(IOType io, U32 port) const;
+        BuiltinType getType(IOType io, U32 port) const;
 
-        Type getType(IOType io, Semantic const& semantic) const;
+        BuiltinType getType(IOType io, Semantic const& semantic) const;
 
-        Type getType(IOType io, std::string const& name) const;
+        BuiltinType getType(IOType io, std::string const& name) const;
 
         std::string getName(IOType io, U32 port) const;
 
@@ -162,11 +79,11 @@ namespace Device {
 
         Semantic getSemantic(IOType io, std::string const& name) const;
 
-        Value* getValuePtr(IOType io, U32 port);
+        BuiltinValueRef* getValuePtr(IOType io, U32 port);
 
-        Value* getValuePtr(IOType io, Semantic const& semantic);
+        BuiltinValueRef* getValuePtr(IOType io, Semantic const& semantic);
 
-        Value* getValuePtr(IOType io, std::string const& name);
+        BuiltinValueRef* getValuePtr(IOType io, std::string const& name);
         // IO interfaces, end
         ///////////////////////////////////////////////////////////
 
@@ -238,14 +155,14 @@ namespace Device {
                 else
                 {
                     // TODO: make default value then bind
-                    Value* value = comp.getValuePtr(io, port);
+                    BuiltinValueRef* value = comp.getValuePtr(io, port);
                     value->bind(nullptr);
                 }
             }
             else
             {
-                Value* value = comp.getValuePtr(io, port);
-                U8* addr = data.getData(channel);
+                BuiltinValueRef* value = comp.getValuePtr(io, port);
+                U8* addr = data.getFieldAddr(channel);
                 value->bind(addr);
                 // std::cout << io << " " << port << " " << channel << " " << (unsigned long)value << " " << value->readAs<Vec3f>() << std::endl;
             }

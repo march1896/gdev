@@ -10,8 +10,8 @@ namespace Device {
         , m_colorTarget{Texture::TexelFormat::R32G32B32_FLOAT, m_width, m_height, nullptr}
         , m_depthTarget{Texture::TexelFormat::D32_FLOAT, m_width, m_height, nullptr}
     {
-        addIOPort(Input, std::string("position"), Type::FLOAT3, Semantic::SV_Position);
-        addIOPort(Input, std::string("color"), Type::FLOAT3, Semantic::SV_Target);
+        addIOPort(Input, std::string("position"), BuiltinType::FLOAT3, Semantic::SV_Position);
+        addIOPort(Input, std::string("color"), BuiltinType::FLOAT3, Semantic::SV_Target);
         m_inPosition = getValuePtr(Input, "position");
         m_inColor = getValuePtr(Input, "color");
     }

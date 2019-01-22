@@ -4,7 +4,7 @@
 #include "texture.h"
 
 namespace Device {
-    void Shader::addSymbol(Section section, std::string const& name, Type const& type, Semantic const& semantic, U8* addr)
+    void Shader::addSymbol(Section section, std::string const& name, BuiltinType const& type, Semantic const& semantic, U8* addr)
     {
         m_symbolSections[section].push_back(Symbol{name, type, semantic, addr});
     }
@@ -31,13 +31,13 @@ namespace Device {
 
         if (itr == symbolSection.end())
         {
-            return Shader::Symbol{"", Type{}, Semantic{}, nullptr};
+            return Shader::Symbol{"", BuiltinType{}, Semantic{}, nullptr};
         }
 
         return *itr;
     }
 
-    Type Shader::getConstantType(std::string const& name) const
+    BuiltinType Shader::getConstantType(std::string const& name) const
     {
         return getSymbol(Shader::Constant, name).type;
     }
@@ -97,19 +97,19 @@ namespace Device {
     {
         Shader shader;
 
-        shader.addSymbol(Shader::Input    , std::string("position")       , Type::FLOAT3   , Semantic::Position0   , (U8*)&VSSimple::inPosition);
-        shader.addSymbol(Shader::Input    , std::string("normal")         , Type::FLOAT3   , Semantic::Normal0     , (U8*)&VSSimple::inNormal);
-        shader.addSymbol(Shader::Input    , std::string("texcoord")       , Type::FLOAT2   , Semantic::Texcoord0   , (U8*)&VSSimple::inTexCoord);
-        shader.addSymbol(Shader::Input    , std::string("color")          , Type::FLOAT3   , Semantic::Color0      , (U8*)&VSSimple::inColor);
+        shader.addSymbol(Shader::Input    , std::string("position")       , BuiltinType::FLOAT3   , Semantic::Position0   , (U8*)&VSSimple::inPosition);
+        shader.addSymbol(Shader::Input    , std::string("normal")         , BuiltinType::FLOAT3   , Semantic::Normal0     , (U8*)&VSSimple::inNormal);
+        shader.addSymbol(Shader::Input    , std::string("texcoord")       , BuiltinType::FLOAT2   , Semantic::Texcoord0   , (U8*)&VSSimple::inTexCoord);
+        shader.addSymbol(Shader::Input    , std::string("color")          , BuiltinType::FLOAT3   , Semantic::Color0      , (U8*)&VSSimple::inColor);
 
-        shader.addSymbol(Shader::Output   , std::string("posClip")        , Type::FLOAT4   , Semantic::SV_Position , (U8*)&VSSimple::outPosClip);
-        shader.addSymbol(Shader::Output   , std::string("posView")        , Type::FLOAT3   , Semantic::Position0   , (U8*)&VSSimple::outPosView);
-        shader.addSymbol(Shader::Output   , std::string("normal")         , Type::FLOAT3   , Semantic::Normal0     , (U8*)&VSSimple::outNormal);
-        shader.addSymbol(Shader::Output   , std::string("color")          , Type::FLOAT3   , Semantic::Color0      , (U8*)&VSSimple::outColor);
-        shader.addSymbol(Shader::Output   , std::string("texcoord")       , Type::FLOAT2   , Semantic::Texcoord0   , (U8*)&VSSimple::outTexCoord);
+        shader.addSymbol(Shader::Output   , std::string("posClip")        , BuiltinType::FLOAT4   , Semantic::SV_Position , (U8*)&VSSimple::outPosClip);
+        shader.addSymbol(Shader::Output   , std::string("posView")        , BuiltinType::FLOAT3   , Semantic::Position0   , (U8*)&VSSimple::outPosView);
+        shader.addSymbol(Shader::Output   , std::string("normal")         , BuiltinType::FLOAT3   , Semantic::Normal0     , (U8*)&VSSimple::outNormal);
+        shader.addSymbol(Shader::Output   , std::string("color")          , BuiltinType::FLOAT3   , Semantic::Color0      , (U8*)&VSSimple::outColor);
+        shader.addSymbol(Shader::Output   , std::string("texcoord")       , BuiltinType::FLOAT2   , Semantic::Texcoord0   , (U8*)&VSSimple::outTexCoord);
 
-        shader.addSymbol(Shader::Constant , std::string("mWorldView")     , Type::FLOAT4X4 , Semantic{}            , (U8*)&VSSimple::mWorldView);
-        shader.addSymbol(Shader::Constant , std::string("mWorldViewProj") , Type::FLOAT4X4 , Semantic{}            , (U8*)&VSSimple::mWorldViewProj);
+        shader.addSymbol(Shader::Constant , std::string("mWorldView")     , BuiltinType::FLOAT4X4 , Semantic{}            , (U8*)&VSSimple::mWorldView);
+        shader.addSymbol(Shader::Constant , std::string("mWorldViewProj") , BuiltinType::FLOAT4X4 , Semantic{}            , (U8*)&VSSimple::mWorldViewProj);
 
         shader.setEntry(&VSSimple::vs_main);
 
@@ -195,23 +195,23 @@ namespace Device {
     {
         Shader shader;
 
-        shader.addSymbol(Shader::Input    , std::string("posClip")         , Type::FLOAT4    , Semantic::SV_Position , (U8*)&PSSimple::inPosClip);
-        shader.addSymbol(Shader::Input    , std::string("posView")         , Type::FLOAT3    , Semantic::Position0   , (U8*)&PSSimple::inPosView);
-        shader.addSymbol(Shader::Input    , std::string("normal")          , Type::FLOAT3    , Semantic::Normal0     , (U8*)&PSSimple::inNormal);
-        shader.addSymbol(Shader::Input    , std::string("color")           , Type::FLOAT3    , Semantic::Color0      , (U8*)&PSSimple::inColor);
-        shader.addSymbol(Shader::Input    , std::string("texcoord")        , Type::FLOAT2    , Semantic::Texcoord0   , (U8*)&PSSimple::inTexCoord);
+        shader.addSymbol(Shader::Input    , std::string("posClip")         , BuiltinType::FLOAT4    , Semantic::SV_Position , (U8*)&PSSimple::inPosClip);
+        shader.addSymbol(Shader::Input    , std::string("posView")         , BuiltinType::FLOAT3    , Semantic::Position0   , (U8*)&PSSimple::inPosView);
+        shader.addSymbol(Shader::Input    , std::string("normal")          , BuiltinType::FLOAT3    , Semantic::Normal0     , (U8*)&PSSimple::inNormal);
+        shader.addSymbol(Shader::Input    , std::string("color")           , BuiltinType::FLOAT3    , Semantic::Color0      , (U8*)&PSSimple::inColor);
+        shader.addSymbol(Shader::Input    , std::string("texcoord")        , BuiltinType::FLOAT2    , Semantic::Texcoord0   , (U8*)&PSSimple::inTexCoord);
 
-        shader.addSymbol(Shader::Output   , std::string("position")        , Type::FLOAT3    , Semantic::SV_Position , (U8*)&PSSimple::outPosition);
-        shader.addSymbol(Shader::Output   , std::string("color")           , Type::FLOAT3    , Semantic::SV_Target   , (U8*)&PSSimple::outColor);
+        shader.addSymbol(Shader::Output   , std::string("position")        , BuiltinType::FLOAT3    , Semantic::SV_Position , (U8*)&PSSimple::outPosition);
+        shader.addSymbol(Shader::Output   , std::string("color")           , BuiltinType::FLOAT3    , Semantic::SV_Target   , (U8*)&PSSimple::outColor);
 
-        shader.addSymbol(Shader::Constant , std::string("cLightPos")       , Type::FLOAT3    , Semantic{}            , (U8*)&PSSimple::cLightPos);
-        shader.addSymbol(Shader::Constant , std::string("cLightAmbient")   , Type::FLOAT3    , Semantic{}            , (U8*)&PSSimple::cLightAmbient);
-        shader.addSymbol(Shader::Constant , std::string("cLightDiffuse")   , Type::FLOAT3    , Semantic{}            , (U8*)&PSSimple::cLightDiffuse);
-        shader.addSymbol(Shader::Constant , std::string("cLightSpecular")  , Type::FLOAT3    , Semantic{}            , (U8*)&PSSimple::cLightSpecular);
-        shader.addSymbol(Shader::Constant , std::string("cLightPower")     , Type::FLOAT     , Semantic{}            , (U8*)&PSSimple::cLightPower);
-        shader.addSymbol(Shader::Constant , std::string("cLightShininess") , Type::FLOAT     , Semantic{}            , (U8*)&PSSimple::cLightShininess);
-        shader.addSymbol(Shader::Constant , std::string("cSampler0")       , Type::Sampler2D , Semantic{}            , (U8*)&PSSimple::cSampler0);
-        shader.addSymbol(Shader::Constant , std::string("cTexture0")       , Type::Texture2D , Semantic{}            , (U8*)&PSSimple::cTexture0);
+        shader.addSymbol(Shader::Constant , std::string("cLightPos")       , BuiltinType::FLOAT3    , Semantic{}            , (U8*)&PSSimple::cLightPos);
+        shader.addSymbol(Shader::Constant , std::string("cLightAmbient")   , BuiltinType::FLOAT3    , Semantic{}            , (U8*)&PSSimple::cLightAmbient);
+        shader.addSymbol(Shader::Constant , std::string("cLightDiffuse")   , BuiltinType::FLOAT3    , Semantic{}            , (U8*)&PSSimple::cLightDiffuse);
+        shader.addSymbol(Shader::Constant , std::string("cLightSpecular")  , BuiltinType::FLOAT3    , Semantic{}            , (U8*)&PSSimple::cLightSpecular);
+        shader.addSymbol(Shader::Constant , std::string("cLightPower")     , BuiltinType::FLOAT     , Semantic{}            , (U8*)&PSSimple::cLightPower);
+        shader.addSymbol(Shader::Constant , std::string("cLightShininess") , BuiltinType::FLOAT     , Semantic{}            , (U8*)&PSSimple::cLightShininess);
+        shader.addSymbol(Shader::Constant , std::string("cSampler0")       , BuiltinType::SAMPLER2D , Semantic{}            , (U8*)&PSSimple::cSampler0);
+        shader.addSymbol(Shader::Constant , std::string("cTexture0")       , BuiltinType::TEXTURE2D , Semantic{}            , (U8*)&PSSimple::cTexture0);
 
         //SHADER_CONST Texture::Sampler2D cSampler0;
         //SHADER_CONST Texture::Texture2D cTexture0;

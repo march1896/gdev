@@ -3,10 +3,10 @@
 namespace Device {
     PrimitiveAssembler::PrimitiveAssembler()
     {
-        addIOPort(Input, std::string("index"), Type::UINT, Semantic::SV_VertexIndex);
+        addIOPort(Input, std::string("index"), BuiltinType::UINT, Semantic::SV_VertexIndex);
         m_inIndex = getValuePtr(Input, "index");
 
-        addIOPort(Output, std::string("index"), Type::UINT, Semantic::SV_VertexIndex);
+        addIOPort(Output, std::string("index"), BuiltinType::UINT, Semantic::SV_VertexIndex);
         m_outIndex = getValuePtr(Output, "index");
     }
 

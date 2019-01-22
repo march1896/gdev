@@ -7,7 +7,7 @@ LINKER_FLAGS = -L/usr/lib -lstdc++ -lm
 BIN = renderer
 BUILD_DIR = ./built
 
-CPP = main.cpp geometry.cpp buffer.cpp component.cpp input_assembler.cpp semantic.cpp shader.cpp rasterizer.cpp output_merger.cpp primitive_assembler.cpp pipeline.cpp texture.cpp shader_processor.cpp model.cpp
+CPP = main.cpp value.cpp geometry.cpp buffer.cpp component.cpp input_assembler.cpp semantic.cpp shader.cpp rasterizer.cpp output_merger.cpp primitive_assembler.cpp pipeline.cpp texture.cpp shader_processor.cpp model.cpp
 OBJ = $(CPP:%.cpp=$(BUILD_DIR)/%.o)
 DEP = $(OBJ:%.o=%.d)
 

@@ -7,75 +7,18 @@
 #include <deque>
 #include <algorithm>
 
-#include "vmath.h"
-#include "semantic.h"
-#include "component.h"
+#include "value.h"
 
 namespace Device {
-
-    // LinearStruct's element is in a contiguous memory layout, quite like C structure type.
-    class LinearStruct
-    {
-    protected:
-        // field information
-        std::vector<U32> m_fieldOffsets;
-        std::vector<Semantic> m_fieldSemantics;
-        std::vector<Type> m_fieldTypes;
-        U32 m_size;
-
-    protected:
-        void updateOffsets();
-
-    public:
-        LinearStruct();
-
-        // Returns field index.
-        U32 addField(Semantic const& semantic, Type const& type);
-
-        // Returns field index.
-        U32 getFieldIndex(Semantic const& semantic) const;
-
-        // Returns field offset
-        U32 getFieldOffset(U32 fieldIndex) const;
-
-        // Returns field offset
-        U32 getFieldOffset(Semantic const& semantic) const;
-
-        Semantic getFieldSemantic(U32 fieldIndex) const;
-
-        U32 numFields() const;
-
-        U32 getSize() const;
-
-        void reset();
-    };
-
-    class LinearStructValue {
-    protected:
-        LinearStruct* m_pStructure;
-        U8* m_pAddr;
-
-    public:
-        LinearStructValue(LinearStruct* pStructure, U8* pAddr)
-            : m_pStructure(pStructure)
-            , m_pAddr(pAddr)
-        {
-        }
-
-        inline U8* getData(U32 fieldIndex) const
-        {
-            return m_pAddr + m_pStructure->getFieldOffset(fieldIndex);
-        }
-    };
 
     // A stream used for inter component communication
     class FifoStream
     {
     public:
-        typedef LinearStructValue Element;
+        typedef StructValueRef Element;
 
     protected:
-        LinearStruct m_structure;
+        StructType m_structure;
 
         U8* m_storage;
         U32 m_capacity;
@@ -90,7 +33,7 @@ namespace Device {
 
         ~FifoStream();
 
-        U32 addChannel(Semantic const& semantic, Type const& type);
+        U32 addChannel(Semantic const& semantic, BuiltinType const& type);
 
         U32 getChannelIndex(Semantic const& semantic) const;
 
@@ -117,10 +60,10 @@ namespace Device {
     class StreamBuffer
     {
     public:
-        typedef LinearStructValue Element;
+        typedef StructValueRef Element;
 
     protected:
-        LinearStruct m_structure;
+        StructType m_structure;
         U8* m_storage;
         U32 m_length;
 
@@ -133,7 +76,7 @@ namespace Device {
 
         Element getElement(U32 index);
 
-        LinearStruct getElementStruct() const;
+        StructType getElementStruct() const;
     };
 
 } // namespace Device

@@ -3,240 +3,6 @@
 #include "component.h"
 
 namespace Device {
-    U32 SizeOf(Type const& type)
-    {
-        switch (type)
-        {
-            case Type::FLOAT:
-                return TypeTrait<Type::FLOAT>::Width;
-            case Type::FLOAT2:
-                return TypeTrait<Type::FLOAT2>::Width;
-            case Type::FLOAT3:
-                return TypeTrait<Type::FLOAT3>::Width;
-            case Type::FLOAT4:
-                return TypeTrait<Type::FLOAT4>::Width;
-            case Type::FLOAT4X4:
-                return TypeTrait<Type::FLOAT4X4>::Width;
-            case Type::HALF:
-                return TypeTrait<Type::HALF>::Width;
-            case Type::DOUBLE:
-                return TypeTrait<Type::DOUBLE>::Width;
-            case Type::INT:
-                return TypeTrait<Type::INT>::Width;
-            case Type::UINT:
-                return TypeTrait<Type::UINT>::Width;
-            case Type::Sampler2D:
-                return TypeTrait<Type::Sampler2D>::Width;
-            case Type::Texture2D:
-                return TypeTrait<Type::Texture2D>::Width;
-            default:
-                assert(0);
-        }
-
-        return 0u;
-    }
-
-    template <typename T>
-    static void interpolateAs(Value* out, Value const* a, float u, Value const* b, float v)
-    {
-        T _a = a->readAs<T>();
-        T _b = b->readAs<T>();
-        T _o = _a * u + _b * v;
-        out->write((U8*)&_o);
-    }
-
-    template <typename T>
-    static void interpolateAs(Value* out, Value const* a, float u, Value const* b, float v, Value const* c, float w)
-    {
-        T _a = a->readAs<T>();
-        T _b = b->readAs<T>();
-        T _c = c->readAs<T>();
-        T _o = _a * u + _b * v + _c * w;
-        out->write((U8*)&_o);
-    }
-
-    void Value::interpolate(Value const* a, float u, Value const* b, float v)
-    {
-        switch (m_type)
-        {
-            case Type::FLOAT:
-            {
-                interpolateAs<float>(this, a, u, b, v);
-                break;
-            }
-            case Type::FLOAT2:
-            {
-                interpolateAs<Vec2f>(this, a, u, b, v);
-                break;
-            }
-            case Type::FLOAT3:
-            {
-                interpolateAs<Vec3f>(this, a, u, b, v);
-                break;
-            }
-            case Type::FLOAT4:
-            {
-                interpolateAs<Vec4f>(this, a, u, b, v);
-                break;
-            }
-            case Type::HALF:
-            {
-                // TODO:
-                assert(0);
-                break;
-            }
-            case Type::DOUBLE:
-            {
-                interpolateAs<double>(this, a, u, b, v);
-                break;
-            }
-            case Type::INT:
-            {
-                interpolateAs<int>(this, a, u, b, v);
-                break;
-            }
-            case Type::UINT:
-            {
-                interpolateAs<U32>(this, a, u, b, v);
-                break;
-            }
-            default:
-            {
-                assert(0);
-            }
-        }
-    }
-
-    void Value::interpolate(Value const* a, float u, Value const* b, float v, Value const* c, float w)
-    {
-        switch (m_type)
-        {
-            case Type::FLOAT:
-            {
-                interpolateAs<float>(this, a, u, b, v, c, w);
-                break;
-            }
-            case Type::FLOAT2:
-            {
-                interpolateAs<Vec2f>(this, a, u, b, v, c, w);
-                break;
-            }
-            case Type::FLOAT3:
-            {
-                interpolateAs<Vec3f>(this, a, u, b, v, c, w);
-                break;
-            }
-            case Type::FLOAT4:
-            {
-                interpolateAs<Vec4f>(this, a, u, b, v, c, w);
-                break;
-            }
-            case Type::HALF:
-            {
-                // TODO:
-                assert(0);
-                break;
-            }
-            case Type::DOUBLE:
-            {
-                interpolateAs<double>(this, a, u, b, v, c, w);
-                break;
-            }
-            case Type::INT:
-            {
-                interpolateAs<int>(this, a, u, b, v, c, w);
-                break;
-            }
-            case Type::UINT:
-            {
-                interpolateAs<U32>(this, a, u, b, v, c, w);
-                break;
-            }
-            default:
-            {
-                assert(0);
-            }
-        }
-    }
-
-    std::ostream &operator<<(std::ostream &stream, Value const& value)
-    {
-        switch (value.type())
-        {
-            case Type::FLOAT:
-            {
-                float cppValue = value.readAs<float>();
-                stream << cppValue;
-                break;
-            }
-            case Type::FLOAT2:
-            {
-                Vec2f cppValue = value.readAs<Vec2f>();
-                stream << cppValue;
-                break;
-            }
-            case Type::FLOAT3:
-            {
-                Vec3f cppValue = value.readAs<Vec3f>();
-                stream << cppValue;
-                break;
-            }
-            case Type::FLOAT4:
-            {
-                Vec4f cppValue = value.readAs<Vec4f>();
-                stream << cppValue;
-                break;
-            }
-            case Type::FLOAT4X4:
-            {
-                Mat44f cppValue = value.readAs<Mat44f>();
-                stream << cppValue;
-                break;
-            }
-            case Type::HALF:
-            {
-                assert(0);
-                break;
-            }
-            case Type::DOUBLE:
-            {
-                double cppValue = value.readAs<double>();
-                stream << cppValue;
-                break;
-            }
-            case Type::INT:
-            {
-                int cppValue = value.readAs<int>();
-                stream << cppValue;
-                break;
-            }
-            case Type::UINT:
-            {
-                U32 cppValue = value.readAs<U32>();
-                stream << cppValue;
-                break;
-            }
-            case Type::Sampler2D:
-            {
-                Texture::Sampler2D sampler = value.readAs<Texture::Sampler2D>();
-                stream << sampler;
-                break;
-            }
-            case Type::Texture2D:
-            {
-                Texture::Texture2D tex = value.readAs<Texture::Texture2D>();
-                stream << tex;
-                break;
-            }
-            default:
-            {
-                assert(0);
-            }
-        }
-
-        return stream;
-    }
-
     Comp::Comp()
         : m_types{}
         , m_values{}
@@ -247,7 +13,7 @@ namespace Device {
     {
     }
 
-    U32 Comp::addIOPort(IOType io, std::string const& name, Type const& type, Semantic const& semantic)
+    U32 Comp::addIOPort(IOType io, std::string const& name, BuiltinType const& type, Semantic const& semantic)
     {
         Types& types = m_types[io];
         Values& values = m_values[io];
@@ -257,7 +23,7 @@ namespace Device {
         symbols.push_back(name);
         types.push_back(type);
         semantics.push_back(semantic);
-        values.push_back(Value{type});
+        values.push_back(BuiltinType{type});
 
         return symbols.size() - 1;
     }
@@ -273,7 +39,7 @@ namespace Device {
         U32 numPorts = getNumPorts(io);
         for (U32 portIndex = 0; portIndex < numPorts; portIndex ++)
         {
-            Type const& type = getType(io, portIndex);
+            BuiltinType const& type = getType(io, portIndex);
             portOffsets.push_back(portOffset);
             portOffset += SizeOf(type);
         }
@@ -322,18 +88,18 @@ namespace Device {
         return findLocation(m_semantics[io], semantic);
     }
 
-    Type Comp::getType(Comp::IOType io, U32 location) const
+    BuiltinType Comp::getType(Comp::IOType io, U32 location) const
     {
         return m_types[io][location];
     }
 
-    Type Comp::getType(Comp::IOType io, Semantic const& semantic) const
+    BuiltinType Comp::getType(Comp::IOType io, Semantic const& semantic) const
     {
         U32 location = getLocation(io, semantic);
         return getType(io, location);
     }
 
-    Type Comp::getType(Comp::IOType io, std::string const& name) const
+    BuiltinType Comp::getType(Comp::IOType io, std::string const& name) const
     {
         U32 location = getLocation(io, name);
         return getType(io, location);
@@ -361,18 +127,18 @@ namespace Device {
         return getSemantic(io, location);
     }
 
-    Value* Comp::getValuePtr(Comp::IOType io, U32 location)
+    BuiltinValueRef* Comp::getValuePtr(Comp::IOType io, U32 location)
     {
         return &m_values[io][location];
     }
 
-    Value* Comp::getValuePtr(Comp::IOType io, Semantic const& semantic)
+    BuiltinValueRef* Comp::getValuePtr(Comp::IOType io, Semantic const& semantic)
     {
         U32 location = getLocation(io, semantic);
         return getValuePtr(io, location);
     }
 
-    Value* Comp::getValuePtr(Comp::IOType io, std::string const& name)
+    BuiltinValueRef* Comp::getValuePtr(Comp::IOType io, std::string const& name)
     {
         U32 location = getLocation(io, name);
         return getValuePtr(io, location);

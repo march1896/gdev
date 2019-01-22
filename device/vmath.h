@@ -568,6 +568,19 @@ T interpolate(T const& a, float a_coff, T const& b, float b_coff, T const& c, fl
     return a * a_coff + b * b_coff + c * c_coff;
 }
 
+// inplace interpolate
+template <typename T>
+void interpolate_inplace(T& out, T const& a, float a_coff, T const& b, float b_coff)
+{
+    out = a * a_coff + b * b_coff;
+}
+
+template <typename T>
+void interpolate_inplace(T& out, T const& a, float a_coff, T const& b, float b_coff, T const& c, float c_coff)
+{
+    out = a * a_coff + b * b_coff + c * c_coff;
+}
+
 template <typename T>
 T clamp(const T& target, T const& lower, T const& upper)
 {

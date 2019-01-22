@@ -68,14 +68,17 @@ void test_rasterizer()
         Vec3f b_color = psInArray[i+1].color;
         Vec3f c_color = psInArray[i+2].color;
 
-        std::vector<BaryCentricCoff> rasterOut = rasterizer.rasterizeTriangle(
+        Triangle2D triangle = setupTriangle(*(Vec2f*)&a_pos, *(Vec2f*)&b_pos, *(Vec2f*)&c_pos);
+
+        std::vector<Vec2f> rasterOut = rasterizer.rasterizeTriangle(
             Vec4f{a_pos.x, a_pos.y, a_pos.z, 1.0f},
             Vec4f{b_pos.x, b_pos.y, b_pos.z, 1.0f},
             Vec4f{c_pos.x, c_pos.y, c_pos.z, 1.0f});
 
         for (U32 j = 0; j < rasterOut.size(); j ++)
         {
-            BaryCentricCoff const& coff = rasterOut[j];
+            Vec2f const& pixel = rasterOut[j];
+            BaryCentricCoff const& coff = calcBaryCentricCoordinates(triangle, pixel);
 
             Vec3f pixelPos = interpolate(a_pos, coff.u, b_pos, coff.v, c_pos, coff.w);
             Vec3f pixelColor = interpolate(a_color, coff.u, b_color, coff.v, c_color, coff.w);

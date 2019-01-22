@@ -2,94 +2,7 @@
 
 #include "buffer.h"
 
-namespace Device { 
-    LinearStruct::LinearStruct()
-        : m_fieldOffsets{}
-        , m_fieldSemantics{}
-        , m_fieldTypes{}
-        , m_size{0}
-    {
-    }
-
-    void LinearStruct::updateOffsets()
-    {
-        m_size = 0;
-
-        m_fieldOffsets.clear();
-        for (U32 fieldIndex = 0; fieldIndex < m_fieldSemantics.size(); ++fieldIndex)
-        {
-            m_fieldOffsets.push_back(m_size);
-
-            m_size += SizeOf(m_fieldTypes[fieldIndex]);
-        }
-    }
-
-    // Returns the field index.
-    U32 LinearStruct::addField(Semantic const& semantic, Type const& type)
-    {
-        for (U32 fieldIndex = 0; fieldIndex < m_fieldSemantics.size(); ++fieldIndex)
-        {
-            Semantic const& fieldSemantic = m_fieldSemantics[fieldIndex];
-
-            if (semantic == fieldSemantic)
-            {
-                // use semantic as binding idertifier, do not permit override.
-                assert(0);
-            }
-        }
-
-        m_fieldSemantics.push_back(semantic);
-        m_fieldTypes.push_back(type);
-
-        // TODO: optimize, we only need to update the last one in this condition.
-        updateOffsets();
-
-        return m_fieldTypes.size() - 1;
-    }
-
-    U32 LinearStruct::getFieldOffset(U32 fieldIndex) const
-    {
-        assert(fieldIndex < m_fieldOffsets.size());
-        return m_fieldOffsets[fieldIndex];
-    }
-
-    U32 LinearStruct::getFieldOffset(Semantic const& semantic) const
-    {
-        U32 fieldIndex = getFieldIndex(semantic);
-        return getFieldOffset(fieldIndex);
-    }
-
-    Semantic LinearStruct::getFieldSemantic(U32 fieldIndex) const
-    {
-        return m_fieldSemantics[fieldIndex];
-    }
-
-    U32 LinearStruct::numFields() const
-    {
-        return m_fieldSemantics.size();
-    }
-
-    U32 LinearStruct::getSize() const
-    {
-        return m_size;
-    }
-
-    void LinearStruct::reset()
-    {
-        m_fieldOffsets.clear();
-        m_fieldSemantics.clear();
-        m_fieldTypes.clear();
-        m_size = 0;
-    }
-
-    // Returns the field index.
-    U32 LinearStruct::getFieldIndex(Semantic const& semantic) const
-    {
-        auto const& itr = std::find(m_fieldSemantics.begin(), m_fieldSemantics.end(), semantic);
-        return itr - m_fieldSemantics.begin();
-    }
-
-
+namespace Device {
     FifoStream::FifoStream()
         : m_structure{}
         , m_storage{nullptr}
@@ -98,7 +11,7 @@ namespace Device {
         , m_end{0u}
     {
     }
-    
+
     FifoStream::~FifoStream()
     {
         if (m_storage)
@@ -108,7 +21,7 @@ namespace Device {
         }
     }
 
-    U32 FifoStream::addChannel(Semantic const& semantic, Type const& type)
+    U32 FifoStream::addChannel(Semantic const& semantic, BuiltinType const& type)
     {
         return m_structure.addField(semantic, type);
     }
@@ -164,7 +77,7 @@ namespace Device {
             assert(0);
         }
 
-        Element element{&m_structure, m_storage + m_end * m_structure.getSize()};
+        Element element{m_structure, m_storage + m_end * m_structure.getSize()};
         m_end ++;
         m_end %= m_capacity;
 
@@ -178,7 +91,7 @@ namespace Device {
             assert(0);
         }
 
-        return Element{&m_structure, m_storage + m_begin * m_structure.getSize()};
+        return Element{m_structure, m_storage + m_begin * m_structure.getSize()};
     }
 
     void FifoStream::popData()
@@ -201,11 +114,11 @@ namespace Device {
 
     StreamBuffer::Element StreamBuffer::getElement(U32 index)
     {
-        return Element{&m_structure, m_storage + index * m_structure.getSize()};
+        return Element{m_structure, m_storage + index * m_structure.getSize()};
     }
 
 
-    LinearStruct StreamBuffer::getElementStruct() const
+    StructType StreamBuffer::getElementStruct() const
     {
         return m_structure;
     }

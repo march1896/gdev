@@ -39,7 +39,7 @@ namespace Device {
                 {
                 }
 
-                inline U8* getData(U32 channel) const
+                inline U8* getFieldAddr(U32 channel) const
                 {
                     return m_vtxStream.getChannelData(m_index, channel);
                 }
@@ -82,7 +82,7 @@ namespace Device {
                 U8* m_addr;
             public:
                 Element(U8* addr) : m_addr(addr) {}
-                inline U8* getData(U32 channel) const
+                inline U8* getFieldAddr(U32 channel) const
                 {
                     (void)channel;
                     return m_addr;

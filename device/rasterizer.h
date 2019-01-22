@@ -18,11 +18,12 @@ namespace Device {
         StreamBuffer m_vsOutBuffer;
         U32 m_vsOutPositionChannel;
 
-        Value* m_inVtxIdx;
+        BuiltinValueRef* m_inVtxIdx;
 
         U32 m_triVtxIndices[3];
         U32 m_triIndex;
-        std::vector<BaryCentricCoff> m_triPending;
+        Triangle2D m_curTriangle;
+        std::vector<Vec2f> m_triPending;
         U32 m_triProcessed;
 
     public:
@@ -38,7 +39,7 @@ namespace Device {
 
         U32 getHeight() const;
 
-        std::vector<BaryCentricCoff> rasterizeTriangle(Vec4f const& va, Vec4f const& vb, Vec4f const& vc);
+        std::vector<Vec2f> rasterizeTriangle(Vec4f const& va, Vec4f const& vb, Vec4f const& vc);
 
         void rasterizeLine(Vec2f const& va, Vec2f const& b);
 
