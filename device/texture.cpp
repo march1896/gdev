@@ -149,6 +149,8 @@ namespace Texture {
         TexelType{ "R32G32B32_FLOAT"    , TF32 ,TF32 ,TF32 ,TNIL ,TNIL ,TNIL }, // R32G32B32_FLOAT
         TexelType{ "R32G32B32_UINT"     , TU32 ,TU32 ,TU32 ,TNIL ,TNIL ,TNIL }, // R32G32B32_UINT
         TexelType{ "R8G8B8A8_UINT"      , TU8  ,TU8  ,TU8  ,TU8  ,TNIL ,TNIL }, // R8G8B8A8_UINT
+        TexelType{ "R8G8B8_UINT"        , TU8  ,TU8  ,TU8  ,TNIL ,TNIL ,TNIL }, // R8G8B8_UINT
+        TexelType{ "B8G8R8_UINT"        , TU8  ,TU8  ,TU8  ,TNIL ,TNIL ,TNIL }, // B8G8R8_UINT
         TexelType{ "D32_FLOAT"          , TNIL ,TNIL ,TNIL ,TNIL ,TF32 ,TNIL }, // D32_FLOAT
     };
 
@@ -170,19 +172,58 @@ namespace Texture {
         return m_storage + offset;
     }
 
-    //extern TexelType const R32G32B32A32_FLOAT;
-    //extern TexelType const R32G32B32A32_UINT;
-    //extern TexelType const R32G32B32_FLOAT;
-    //extern TexelType const R32G32B32_UINT;
-    //extern TexelType const R8G8B8A8_UINT;
-    //extern TexelType const D32_FLOAT;
+    // [ref](https://en.wikipedia.org/wiki/Bilinear_filtering)
+    static Vec4f SampleBilinear(Texture2D const& tex, float u, float v)
+    {
+        u = u * tex.getWidth() - 0.5f;
+        v = v * tex.getHeight() - 0.5f;
 
-    //TexelType const R32G32B32A32_FLOAT { "R32G32B32A32_FLOAT" , F32 , F32 , F32 , F32 , NIL , NIL};
-    //TexelType const R32G32B32A32_UINT  { "R32G32B32A32_UINT"  , U32 , U32 , U32 , U32 , NIL , NIL};
-    //TexelType const R32G32B32_FLOAT    { "R32G32B32_FLOAT"    , F32 , F32 , F32 , NIL , NIL , NIL};
-    //TexelType const R32G32B32_UINT     { "R32G32B32_UINT"     , U32 , U32 , U32 , NIL , NIL , NIL};
-    //TexelType const R8G8B8A8_UINT      { "R8G8B8A8_UINT"      , U8  , U8  , U8  , U8  , NIL , NIL};
-    //TexelType const D32_FLOAT          { "D32_FLOAT"          , NIL , NIL , NIL , NIL , F32 , NIL};
+        int x = std::floor(u);
+        int y = std::floor(v);
+        float u_ratio = u - x;
+        float v_ratio = v - y;
+        float u_opposite = 1 - u_ratio;
+        float v_opposite = 1 - v_ratio;
+
+        Vec4f lb = tex.getTexelAsVec4f(x, y);
+        Vec4f rb = tex.getTexelAsVec4f(x+1, y);
+        Vec4f lt = tex.getTexelAsVec4f(x, y+1);
+        Vec4f rt = tex.getTexelAsVec4f(x+1, y+1);
+
+        Vec4f result = interpolate(interpolate(lb, u_opposite, rb, u_ratio), v_opposite,
+                               interpolate(lt, u_opposite, rt, u_ratio), v_ratio);
+        return result;
+    }
+
+    static Vec4f SampleNearest(Texture2D const& tex, float u, float v)
+    {
+        u = u * tex.getWidth() - 0.5f;
+        v = v * tex.getHeight() - 0.5f;
+
+        float x = std::nearbyint(u);
+        float y = std::nearbyint(v);
+
+        Vec4f result = tex.getTexelAsVec4f(x, y);
+        return result;
+    }
+
+    Vec4f Sample(Texture2D const& tex, Sampler2D const& samp, Vec2f const& uv)
+    {
+        if (tex.getStorage() == nullptr)
+        {
+            return Vec4f{};
+        }
+
+        switch (samp.filter)
+        {
+            case FilterMode::NEAREST:
+                return SampleNearest(tex, uv.x, uv.y);
+            case FilterMode::LINEAR:
+                return SampleBilinear(tex, uv.x, uv.y);
+            default:
+                return Vec4f{};
+        }
+    }
 
     void saveAsBmp(std::string const& filename, Texture2D const& texture)
     {

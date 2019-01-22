@@ -106,6 +106,8 @@ namespace Texture {
         R32G32B32_FLOAT,
         R32G32B32_UINT,
         R8G8B8A8_UINT,
+        R8G8B8_UINT,
+        B8G8R8_UINT,
         D32_FLOAT,
     };
 
@@ -165,6 +167,58 @@ namespace Texture {
             return result;
         }
 
+        inline Vec4f getTexelAsVec4f(U32 x, U32 y) const
+        {
+            U8* pTexel = readTexel(x, y);
+
+            switch (m_format)
+            {
+                case TexelFormat::R32G32B32A32_FLOAT:
+                {
+                    Vec4f data = *reinterpret_cast<Vec4f*>(pTexel);
+                    return data;
+                }
+                case TexelFormat::R32G32B32A32_UINT:
+                {
+                    Vec4<U32> data = *reinterpret_cast<Vec4<U32>*>(pTexel);
+                    return Vec4f{(float)data.x/255, (float)data.y/255, (float)data.z/255, (float)data.w/255};
+                }
+                case TexelFormat::R32G32B32_FLOAT:
+                {
+                    Vec4f data = *reinterpret_cast<Vec4f*>(pTexel);
+                    return Vec4f{data.x, data.y, data.z, 1.0f};
+                }
+                case TexelFormat::R32G32B32_UINT:
+                {
+                    Vec4<U32> data = *reinterpret_cast<Vec4<U32>*>(pTexel);
+                    return Vec4f{(float)data.x/255, (float)data.y/255, (float)data.z/255, 1.0f};
+                }
+                case TexelFormat::R8G8B8A8_UINT:
+                {
+                    Vec4<U8> data = *reinterpret_cast<Vec4<U8>*>(pTexel);
+                    return Vec4f{(float)data.x/255, (float)data.y/255, (float)data.z/255, (float)data.w/255};
+                }
+                case TexelFormat::R8G8B8_UINT:
+                {
+                    Vec4<U8> data = *reinterpret_cast<Vec4<U8>*>(pTexel);
+                    return Vec4f{(float)data.x/255, (float)data.y/255, (float)data.z/255, 1.0f};
+                }
+                case TexelFormat::B8G8R8_UINT:
+                {
+                    Vec4<U8> data = *reinterpret_cast<Vec4<U8>*>(pTexel);
+                    return Vec4f{(float)data.z/255, (float)data.y/255, (float)data.x/255, 1.0f};
+                }
+                case TexelFormat::D32_FLOAT:
+                {
+                    float data = *reinterpret_cast<float*>(pTexel);
+                    return Vec4f{data, data, data, data};
+                }
+                default:
+                    assert(0);
+            }
+
+        }
+
         void writeTexel(U32 x, U32 y, U8* pNewTexel);
 
         U8* readTexel(U32 x, U32 y) const;
@@ -172,61 +226,9 @@ namespace Texture {
 
     std::ostream &operator<<(std::ostream &stream, Texture2D const& tex);
 
-    // [ref](https://en.wikipedia.org/wiki/Bilinear_filtering)
-    template <typename T>
-    T SampleBilinear(Texture2D const& tex, float u, float v)
-    {
-        u = u * tex.getWidth() - 0.5f;
-        v = v * tex.getHeight() - 0.5f;
-
-        int x = std::floor(u);
-        int y = std::floor(v);
-        float u_ratio = u - x;
-        float v_ratio = v - y;
-        float u_opposite = 1 - u_ratio;
-        float v_opposite = 1 - v_ratio;
-
-        T lb = tex.getTexel<T>(x, y);
-        T rb = tex.getTexel<T>(x+1, y);
-        T lt = tex.getTexel<T>(x, y+1);
-        T rt = tex.getTexel<T>(x+1, y+1);
-
-        T result = interpolate(interpolate(lb, u_opposite, rb, u_ratio), v_opposite,
-                               interpolate(lt, u_opposite, rt, u_ratio), v_ratio);
-        return result;
-    }
-
-    template <typename T>
-    T SampleNearest(Texture2D const& tex, float u, float v)
-    {
-        u = u * tex.getWidth() - 0.5f;
-        v = v * tex.getHeight() - 0.5f;
-
-        float x = std::nearbyint(u);
-        float y = std::nearbyint(v);
-
-        T result = tex.getTexel<T>(x, y);
-        return result;
-    }
-
-    template <typename T>
-    T Sample(Texture2D const& tex, Sampler2D const& samp, Vec2f const& uv)
-    {
-        if (tex.getStorage() == nullptr)
-        {
-            return T{};
-        }
-
-        switch (samp.filter)
-        {
-            case FilterMode::NEAREST:
-                return SampleNearest<T>(tex, uv.x, uv.y);
-            case FilterMode::LINEAR:
-                return SampleBilinear<T>(tex, uv.x, uv.y);
-            default:
-                return T{};
-        }
-    }
+    // [Ref](http://www.shaderific.com/glsl-functions/)
+    // From OpenGL texture() spec, it returns a vec4
+    Vec4f Sample(Texture2D const& tex, Sampler2D const& samp, Vec2f const& uv);
 
     void saveAsBmp(std::string const& filename, Texture2D const& colorTarget);
 } // namespace Texture

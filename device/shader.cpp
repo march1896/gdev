@@ -84,6 +84,7 @@ namespace Device {
             // std::cout << "VS: " << outPosClip << std::endl;
 
             outColor = inColor;
+            outTexCoord = inTexCoord;
 
             // TODO: direct Mat44f * Vec3f?
             Vec4f normal = {inNormal.x, inNormal.y, inNormal.z, 0};
@@ -134,6 +135,7 @@ namespace Device {
         SHADER_CONST float cLightShininess;
         // SHADER_CONST float screenGamma; // Assume the monitor is calibrated to the sRGB color space
 
+        // TODO: we should make it a opaque type for shaders
         SHADER_CONST Texture::Sampler2D cSampler0;
         SHADER_CONST Texture::Texture2D cTexture0;
 
@@ -177,9 +179,10 @@ namespace Device {
             Vec3f specularLinear = specular * cLightSpecular * cLightPower / distance;
 
             Vec3f lightColor = ambientLinear + diffuseLinear + specularLinear;
-            // Vec3f texColor = Texture::Sample<Vec3f>(cTexture0, cSampler0, inTexCoord);
+            Vec4f texColor = Texture::Sample(cTexture0, cSampler0, inTexCoord);
             // TODO: continue, mix the texture color with lighting color.
-            outColor = lightColor;
+            // outColor = lightColor;
+            outColor = {texColor.x, texColor.y, texColor.z};
 
             // apply gamma correction (assume cLightAmbient, cLightDiffuse and cLightSpecular
             // have been linearized, i.e. have no gamma correction in them)

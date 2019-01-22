@@ -2,8 +2,9 @@
 #include <string>
 #include <vector>
 #include <algorithm>
-
 #include <stddef.h>     /* offsetof */
+
+#include "bitmap_image.h"
 
 #include "vmath.h"
 #include "semantic.h"
@@ -11,7 +12,6 @@
 #include "texture.h"
 #include "rasterizer.h"
 #include "pipeline.h"
-
 #include "model.h"
 
 using namespace Device;
@@ -258,6 +258,8 @@ void test_fixed_pipeline()
     Vec3f* pLightSpecular = (Vec3f*)psShader.getConstantAddr("cLightSpecular");
     float* pLightPower  = (float*)psShader.getConstantAddr("cLightPower");
     float* pLightShininess  = (float*)psShader.getConstantAddr("cLightShininess");
+    Texture::Texture2D* pTexture = (Texture::Texture2D*)psShader.getConstantAddr("cTexture0");
+    Texture::Sampler2D* pSampler = (Texture::Sampler2D*)psShader.getConstantAddr("cSampler0");
     {
         Vec4f lightPosWorld = Vec4f{8.0, 8.0, 5.0, 1.0};
         Vec4f lightPos = matView * lightPosWorld;
@@ -296,14 +298,23 @@ void test_fixed_pipeline()
 
             Mat44f* pMatWorldViewProj = (Mat44f*)vsShader.getConstantAddr("mWorldViewProj");
             *pMatWorldViewProj = matWorldViewProj;
+
+            // This is not needed for now.
+            //Mat44f matWorldViewIT;
+            //Mat44f matViewIT;
         }
 
-        //Mat44f matWorldViewIT;
-        //Mat44f matViewIT;
+        // setup texture
+        bitmap_image image("resources/earth2048.bmp");
+        {
+            *pTexture = {Texture::TexelFormat::B8G8R8_UINT, image.width(), image.height(), image.data()};
+            *pSampler = {Texture::FilterMode::NEAREST, Texture::AddressMode::WRAP, Texture::AddressMode::WRAP};
+        }
 
         device.setVertexBufferChannel(Semantic::Position0, (U8*)vertices.data(), 0, sizeof(Vec3f));
         // device.setVertexBufferChannel(Semantic::Color0, (U8*)normals.data(), 0, sizeof(Vec3f));
         device.setVertexBufferChannel(Semantic::Normal0, (U8*)normals.data(), 0, sizeof(Vec3f));
+        device.setVertexBufferChannel(Semantic::Texcoord0, (U8*)texCoords.data(), 0, sizeof(Vec2f));
 
         device.setVertexBufferLength(vertices.size());
 
@@ -340,9 +351,17 @@ void test_fixed_pipeline()
             *pLightDiffuse = {0.0, 0.0, 1.0};
         }
 
+        // setup texture
+        bitmap_image image("resources/earth2048.bmp");
+        {
+            *pTexture = {Texture::TexelFormat::B8G8R8_UINT, image.width(), image.height(), image.data()};
+            *pSampler = {Texture::FilterMode::NEAREST, Texture::AddressMode::WRAP, Texture::AddressMode::WRAP};
+        }
+
         device.setVertexBufferChannel(Semantic::Position0, (U8*)vertices.data(), 0, sizeof(Vec3f));
         // device.setVertexBufferChannel(Semantic::Color0, (U8*)normals.data(), 0, sizeof(Vec3f));
         device.setVertexBufferChannel(Semantic::Normal0, (U8*)normals.data(), 0, sizeof(Vec3f));
+        device.setVertexBufferChannel(Semantic::Texcoord0, (U8*)texCoords.data(), 0, sizeof(Vec2f));
 
         device.setVertexBufferLength(vertices.size());
 
