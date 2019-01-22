@@ -9,6 +9,7 @@
 
 #include "vmath.h"
 #include "semantic.h"
+#include "texture.h"
 
 namespace Device {
 
@@ -29,6 +30,10 @@ namespace Device {
         DOUBLE,
 
         INT,
+
+        Sampler2D,
+
+        Texture2D,
 
         UINT,
     };
@@ -57,6 +62,8 @@ namespace Device {
     def_type_trait(Type::UINT,  unsigned int)
     def_type_trait(Type::INT, int)
     def_type_trait(Type::HALF, short)
+    def_type_trait(Type::Sampler2D, Texture::Sampler2D)
+    def_type_trait(Type::Texture2D, Texture::Texture2D)
 
 #undef def_type_trait
 

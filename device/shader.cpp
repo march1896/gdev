@@ -1,6 +1,7 @@
 #include <algorithm>
 
 #include "shader.h"
+#include "texture.h"
 
 namespace Device {
     void Shader::addSymbol(Section section, std::string const& name, Type const& type, Semantic const& semantic, U8* addr)
@@ -60,12 +61,14 @@ namespace Device {
     {
         SHADER_IN Vec3f inPosition;
         SHADER_IN Vec3f inNormal;
+        SHADER_IN Vec2f inTexCoord;
         SHADER_IN Vec3f inColor;
 
         SHADER_OUT Vec4f outPosClip;
         SHADER_OUT Vec3f outPosView;
         SHADER_OUT Vec3f outColor;
         SHADER_OUT Vec3f outNormal;
+        SHADER_OUT Vec2f outTexCoord;
 
         SHADER_CONST Mat44f mWorldView;
         SHADER_CONST Mat44f mWorldViewProj;
@@ -95,12 +98,14 @@ namespace Device {
 
         shader.addSymbol(Shader::Input    , std::string("position")       , Type::FLOAT3   , Semantic::Position0   , (U8*)&VSSimple::inPosition);
         shader.addSymbol(Shader::Input    , std::string("normal")         , Type::FLOAT3   , Semantic::Normal0     , (U8*)&VSSimple::inNormal);
+        shader.addSymbol(Shader::Input    , std::string("texcoord")       , Type::FLOAT2   , Semantic::Texcoord0   , (U8*)&VSSimple::inTexCoord);
         shader.addSymbol(Shader::Input    , std::string("color")          , Type::FLOAT3   , Semantic::Color0      , (U8*)&VSSimple::inColor);
 
         shader.addSymbol(Shader::Output   , std::string("posClip")        , Type::FLOAT4   , Semantic::SV_Position , (U8*)&VSSimple::outPosClip);
         shader.addSymbol(Shader::Output   , std::string("posView")        , Type::FLOAT3   , Semantic::Position0   , (U8*)&VSSimple::outPosView);
         shader.addSymbol(Shader::Output   , std::string("normal")         , Type::FLOAT3   , Semantic::Normal0     , (U8*)&VSSimple::outNormal);
         shader.addSymbol(Shader::Output   , std::string("color")          , Type::FLOAT3   , Semantic::Color0      , (U8*)&VSSimple::outColor);
+        shader.addSymbol(Shader::Output   , std::string("texcoord")       , Type::FLOAT2   , Semantic::Texcoord0   , (U8*)&VSSimple::outTexCoord);
 
         shader.addSymbol(Shader::Constant , std::string("mWorldView")     , Type::FLOAT4X4 , Semantic{}            , (U8*)&VSSimple::mWorldView);
         shader.addSymbol(Shader::Constant , std::string("mWorldViewProj") , Type::FLOAT4X4 , Semantic{}            , (U8*)&VSSimple::mWorldViewProj);
@@ -116,6 +121,7 @@ namespace Device {
         SHADER_IN Vec3f inPosView;
         SHADER_IN Vec3f inColor;
         SHADER_IN Vec3f inNormal;
+        SHADER_IN Vec2f inTexCoord;
 
         SHADER_OUT Vec3f outPosition;
         SHADER_OUT Vec3f outColor;
@@ -127,6 +133,9 @@ namespace Device {
         SHADER_CONST float cLightPower;
         SHADER_CONST float cLightShininess;
         // SHADER_CONST float screenGamma; // Assume the monitor is calibrated to the sRGB color space
+
+        SHADER_CONST Texture::Sampler2D cSampler0;
+        SHADER_CONST Texture::Texture2D cTexture0;
 
         static void Blinn_Phong();
         // [ref](https://en.wikipedia.org/wiki/Blinn%E2%80%93Phong_shading_model)
@@ -167,7 +176,10 @@ namespace Device {
             Vec3f diffuseLinear = lambertian * cLightDiffuse * cLightPower / distance;
             Vec3f specularLinear = specular * cLightSpecular * cLightPower / distance;
 
-            outColor = ambientLinear + diffuseLinear + specularLinear;
+            Vec3f lightColor = ambientLinear + diffuseLinear + specularLinear;
+            // Vec3f texColor = Texture::Sample<Vec3f>(cTexture0, cSampler0, inTexCoord);
+            // TODO: continue, mix the texture color with lighting color.
+            outColor = lightColor;
 
             // apply gamma correction (assume cLightAmbient, cLightDiffuse and cLightSpecular
             // have been linearized, i.e. have no gamma correction in them)
@@ -182,26 +194,31 @@ namespace Device {
     {
         Shader shader;
 
-        shader.addSymbol(Shader::Input    , std::string("posClip")         , Type::FLOAT4 , Semantic::SV_Position , (U8*)&PSSimple::inPosClip);
-        shader.addSymbol(Shader::Input    , std::string("posView")         , Type::FLOAT3 , Semantic::Position0   , (U8*)&PSSimple::inPosView);
-        shader.addSymbol(Shader::Input    , std::string("normal")          , Type::FLOAT3 , Semantic::Normal0     , (U8*)&PSSimple::inNormal);
-        shader.addSymbol(Shader::Input    , std::string("color")           , Type::FLOAT3 , Semantic::Color0      , (U8*)&PSSimple::inColor);
+        shader.addSymbol(Shader::Input    , std::string("posClip")         , Type::FLOAT4    , Semantic::SV_Position , (U8*)&PSSimple::inPosClip);
+        shader.addSymbol(Shader::Input    , std::string("posView")         , Type::FLOAT3    , Semantic::Position0   , (U8*)&PSSimple::inPosView);
+        shader.addSymbol(Shader::Input    , std::string("normal")          , Type::FLOAT3    , Semantic::Normal0     , (U8*)&PSSimple::inNormal);
+        shader.addSymbol(Shader::Input    , std::string("color")           , Type::FLOAT3    , Semantic::Color0      , (U8*)&PSSimple::inColor);
+        shader.addSymbol(Shader::Input    , std::string("texcoord")        , Type::FLOAT2    , Semantic::Texcoord0   , (U8*)&PSSimple::inTexCoord);
 
-        shader.addSymbol(Shader::Output   , std::string("position")        , Type::FLOAT3 , Semantic::SV_Position , (U8*)&PSSimple::outPosition);
-        shader.addSymbol(Shader::Output   , std::string("color")           , Type::FLOAT3 , Semantic::SV_Target   , (U8*)&PSSimple::outColor);
+        shader.addSymbol(Shader::Output   , std::string("position")        , Type::FLOAT3    , Semantic::SV_Position , (U8*)&PSSimple::outPosition);
+        shader.addSymbol(Shader::Output   , std::string("color")           , Type::FLOAT3    , Semantic::SV_Target   , (U8*)&PSSimple::outColor);
 
-        shader.addSymbol(Shader::Constant , std::string("cLightPos")       , Type::FLOAT3  , Semantic{}           , (U8*)&PSSimple::cLightPos);
-        shader.addSymbol(Shader::Constant , std::string("cLightAmbient")   , Type::FLOAT3  , Semantic{}           , (U8*)&PSSimple::cLightAmbient);
-        shader.addSymbol(Shader::Constant , std::string("cLightDiffuse")   , Type::FLOAT3  , Semantic{}           , (U8*)&PSSimple::cLightDiffuse);
-        shader.addSymbol(Shader::Constant , std::string("cLightSpecular")  , Type::FLOAT3  , Semantic{}           , (U8*)&PSSimple::cLightSpecular);
-        shader.addSymbol(Shader::Constant , std::string("cLightPower")     , Type::FLOAT   , Semantic{}           , (U8*)&PSSimple::cLightPower);
-        shader.addSymbol(Shader::Constant , std::string("cLightShininess") , Type::FLOAT   , Semantic{}           , (U8*)&PSSimple::cLightShininess);
+        shader.addSymbol(Shader::Constant , std::string("cLightPos")       , Type::FLOAT3    , Semantic{}            , (U8*)&PSSimple::cLightPos);
+        shader.addSymbol(Shader::Constant , std::string("cLightAmbient")   , Type::FLOAT3    , Semantic{}            , (U8*)&PSSimple::cLightAmbient);
+        shader.addSymbol(Shader::Constant , std::string("cLightDiffuse")   , Type::FLOAT3    , Semantic{}            , (U8*)&PSSimple::cLightDiffuse);
+        shader.addSymbol(Shader::Constant , std::string("cLightSpecular")  , Type::FLOAT3    , Semantic{}            , (U8*)&PSSimple::cLightSpecular);
+        shader.addSymbol(Shader::Constant , std::string("cLightPower")     , Type::FLOAT     , Semantic{}            , (U8*)&PSSimple::cLightPower);
+        shader.addSymbol(Shader::Constant , std::string("cLightShininess") , Type::FLOAT     , Semantic{}            , (U8*)&PSSimple::cLightShininess);
+        shader.addSymbol(Shader::Constant , std::string("cSampler0")       , Type::Sampler2D , Semantic{}            , (U8*)&PSSimple::cSampler0);
+        shader.addSymbol(Shader::Constant , std::string("cTexture0")       , Type::Texture2D , Semantic{}            , (U8*)&PSSimple::cTexture0);
+
+        //SHADER_CONST Texture::Sampler2D cSampler0;
+        //SHADER_CONST Texture::Texture2D cTexture0;
 
         shader.setEntry(&PSSimple::ps_main);
 
         return shader;
     }
-
 
     Shader loadShader(std::string const& filePath)
     {

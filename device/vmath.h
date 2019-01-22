@@ -96,6 +96,19 @@ inline Vec2<T> operator* (T const& m, Vec2<T> const& a)
     return Vec2<T>{a.x * m, a.y * m};
 }
 
+// [ref](https://en.wikibooks.org/wiki/GLSL_Programming/Vector_and_Matrix_Operations#Operators)
+template <typename T>
+inline Vec2<T> operator* (Vec2<T> const& a, Vec2<T> const& b)
+{
+    return Vec2<T>{a.x * b.x, a.y * b.y};
+}
+
+template <typename T>
+inline Vec2<T> operator/ (Vec2<T> const& a, Vec2<T> const& b)
+{
+    return Vec2<T>{a.x / b.x, a.y / b.y, a.z / b.z};
+}
+
 template <typename T>
 inline T dot(Vec2<T> const& a, Vec2<T> const& b)
 {
@@ -191,6 +204,20 @@ inline Vec3<T> operator* (T const& m, Vec3<T> const& a)
     return Vec3<T>{a.x * m, a.y * m, a.z * m};
 }
 
+// Note: operator* operator/ works on component-wise.
+// [ref](https://en.wikibooks.org/wiki/GLSL_Programming/Vector_and_Matrix_Operations#Operators)
+template <typename T>
+inline Vec3<T> operator* (Vec3<T> const& a, Vec3<T> const& b)
+{
+    return Vec3<T>{a.x * b.x, a.y * b.y, a.z * b.z};
+}
+
+template <typename T>
+inline Vec3<T> operator/ (Vec3<T> const& a, Vec3<T> const& b)
+{
+    return Vec3<T>{a.x / b.x, a.y / b.y, a.z / b.z};
+}
+
 template <typename T>
 inline Vec3<T> operator/ (Vec3<T> const& a, T const& m)
 {
@@ -282,6 +309,19 @@ template <typename T>
 inline Vec4<T> operator/ (T const& m, Vec4<T> const& a)
 {
     return Vec4<T>{m / a.x, m / a.y, m / a.z, m / a.w};
+}
+
+// [ref](https://en.wikibooks.org/wiki/GLSL_Programming/Vector_and_Matrix_Operations#Operators)
+template <typename T>
+inline Vec4<T> operator* (Vec4<T> const& a, Vec4<T> const& b)
+{
+    return Vec4<T>{a.x * b.x, a.y * b.y};
+}
+
+template <typename T>
+inline Vec4<T> operator/ (Vec4<T> const& a, Vec4<T> const& b)
+{
+    return Vec4<T>{a.x / b.x, a.y / b.y, a.z / b.z};
 }
 
 template <typename T>
@@ -514,7 +554,6 @@ Matrix44<T> operator/ (T const& t, Matrix44<T> const& b)
 }
 
 // TODO: calculate the inverse matrix
-
 
 // common math operations
 template <typename T>

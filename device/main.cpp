@@ -15,18 +15,20 @@
 #include "model.h"
 
 using namespace Device;
+using namespace Device::Texture;
 
 static const U32 WIDTH = 1024;
 static const U32 HEIGHT = 768;
 
 void test_rasterizer()
 {
-    typedef Vec3f Color;
     Rasterizer rasterizer{};
     rasterizer.resize(WIDTH, HEIGHT);
 
-    Surface<Color> colorTarget{WIDTH, HEIGHT};
-    Surface<float> depthTarget{WIDTH, HEIGHT};
+    std::vector<Vec3f> colorTex(WIDTH * HEIGHT);
+    std::vector<float> depthTex(WIDTH * HEIGHT);
+    Texture2D colorTarget{TexelFormat::R32G32B32_FLOAT, WIDTH, HEIGHT, (U8*)colorTex.data()};
+    Texture2D depthTarget{TexelFormat::D32_FLOAT, WIDTH, HEIGHT, (U8*)depthTex.data()};
 
     struct PSInFormat
     {
@@ -78,6 +80,8 @@ void test_rasterizer()
             Vec3f pixelPos = interpolate(a_pos, coff.u, b_pos, coff.v, c_pos, coff.w);
             Vec3f pixelColor = interpolate(a_color, coff.u, b_color, coff.v, c_color, coff.w);
             float depth = interpolate(a_pos.z, coff.u, b_pos.z, coff.v, c_pos.z, coff.w);
+            // map [-1, 1] to [1, 0]
+            depth = -(depth - 1.0f) / 2.0f;
 
             int screen_x = std::nearbyint(pixelPos.x * WIDTH);
             int screen_y = std::nearbyint(pixelPos.y * HEIGHT);
@@ -86,13 +90,13 @@ void test_rasterizer()
             screen_x = (screen_x + WIDTH) / 2;
             screen_y = (screen_y + HEIGHT) / 2;
 
-            colorTarget.setPixel(screen_x, screen_y, pixelColor);
-            depthTarget.setPixel(screen_x, screen_y, depth);
+            colorTarget.setTexel(screen_x, screen_y, pixelColor);
+            depthTarget.setTexel(screen_x, screen_y, depth);
         }
     }
 
-    saveAsBmp("fb_color.bmp", colorTarget);
-    saveAsBmp("fb_depth.bmp", depthTarget);
+    Texture::saveAsBmp("fb_color.bmp", colorTarget);
+    Texture::saveAsBmp("fb_depth.bmp", depthTarget);
 }
 
 // Ref: http://www.songho.ca/opengl/gl_camera.html

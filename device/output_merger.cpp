@@ -5,6 +5,10 @@ namespace Device {
     OutputMerger::OutputMerger()
         : m_width(0)
         , m_height(0)
+        , m_colorStorage{}
+        , m_depthStorage{}
+        , m_colorTarget{Texture::TexelFormat::R32G32B32_FLOAT, m_width, m_height, nullptr}
+        , m_depthTarget{Texture::TexelFormat::D32_FLOAT, m_width, m_height, nullptr}
     {
         addIOPort(Input, std::string("position"), Type::FLOAT3, Semantic::SV_Position);
         addIOPort(Input, std::string("color"), Type::FLOAT3, Semantic::SV_Target);
@@ -22,8 +26,14 @@ namespace Device {
         m_width = width;
         m_height = height;
 
-        m_colorTarget.resize(width, height);
-        m_depthTarget.resize(width, height);
+        m_colorStorage.resize(width * height);
+        m_depthStorage.resize(width * height);
+
+        m_colorTarget.setSize(width, height);
+        m_depthTarget.setSize(width, height);
+
+        m_colorTarget.setStorage((U8*)m_colorStorage.data());
+        m_depthTarget.setStorage((U8*)m_depthStorage.data());
     }
 
     void OutputMerger::setWidth(U32 width)
@@ -71,16 +81,16 @@ namespace Device {
 
         // map [-1, 1] to [1, 0]
         float depth = -(pos.z - 1.0f) / 2.0f;
-        bool zTestResult = depth > m_depthTarget.getPixel(screen_x, screen_y);
+        bool zTestResult = depth > m_depthTarget.getTexel<float>(screen_x, screen_y);
         if (zTestResult)
         {
-            m_depthTarget.setPixel(screen_x, screen_y, depth);
+            m_depthTarget.setTexel(screen_x, screen_y, depth);
         }
 
         if (zTestResult)
         {
             Vec3f color = m_inColor->readAs<Vec3f>();
-            m_colorTarget.setPixel(screen_x, screen_y, color);
+            m_colorTarget.setTexel(screen_x, screen_y, color);
         }
     }
 
@@ -96,7 +106,7 @@ namespace Device {
 
     void OutputMerger::presentToBmp() const
     {
-        saveAsBmp("fb_color.bmp", m_colorTarget);
-        saveAsBmp("fb_depth.bmp", m_depthTarget);
+        Texture::saveAsBmp("fb_color.bmp", m_colorTarget);
+        Texture::saveAsBmp("fb_depth.bmp", m_depthTarget);
     }
 } // namespace Device

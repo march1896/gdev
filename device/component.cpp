@@ -25,6 +25,10 @@ namespace Device {
                 return TypeTrait<Type::INT>::Width;
             case Type::UINT:
                 return TypeTrait<Type::UINT>::Width;
+            case Type::Sampler2D:
+                return TypeTrait<Type::Sampler2D>::Width;
+            case Type::Texture2D:
+                return TypeTrait<Type::Texture2D>::Width;
             default:
                 assert(0);
         }
@@ -208,8 +212,20 @@ namespace Device {
             }
             case Type::UINT:
             {
-                uint cppValue = value.readAs<uint>();
+                U32 cppValue = value.readAs<U32>();
                 stream << cppValue;
+                break;
+            }
+            case Type::Sampler2D:
+            {
+                Texture::Sampler2D sampler = value.readAs<Texture::Sampler2D>();
+                stream << sampler;
+                break;
+            }
+            case Type::Texture2D:
+            {
+                Texture::Texture2D tex = value.readAs<Texture::Texture2D>();
+                stream << tex;
                 break;
             }
             default:

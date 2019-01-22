@@ -12,9 +12,12 @@ namespace Device {
         U32 m_width;
         U32 m_height;
 
+        std::vector<Vec3f> m_colorStorage;
+        std::vector<float> m_depthStorage;
+
         // TODO: handle alpha?
-        Surface<Vec3f> m_colorTarget;
-        Surface<float> m_depthTarget;
+        Texture::Texture2D m_colorTarget;
+        Texture::Texture2D m_depthTarget;
         // TODO: stencil target?
 
         Value* m_inPosition;
