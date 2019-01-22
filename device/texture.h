@@ -55,14 +55,16 @@ namespace Device { namespace Texture {
         TexelFormat m_format;
         U32 m_width;
         U32 m_height;
-        U8* m_storage;
+        U8* m_texData;
+        U8* m_mipmapData;
 
     public:
         Texture2D()
             : m_format{TexelFormat::UNKNOWN}
             , m_width{0}
             , m_height{0}
-            , m_storage{nullptr}
+            , m_texData{nullptr}
+            , m_mipmapData{nullptr}
         {
         }
 
@@ -70,8 +72,18 @@ namespace Device { namespace Texture {
             : m_format{format}
             , m_width{width}
             , m_height{height}
-            , m_storage{storage}
+            , m_texData{storage}
+            , m_mipmapData{nullptr}
         {
+        }
+
+        ~Texture2D()
+        {
+            if (m_mipmapData != nullptr)
+            {
+                free(m_mipmapData);
+                m_mipmapData = nullptr;
+            }
         }
 
         inline void setFormat(TexelFormat format) { m_format = format; }
@@ -88,9 +100,9 @@ namespace Device { namespace Texture {
 
         inline void setSize(U32 width, U32 height) { m_width = width; m_height = height; }
 
-        inline void setStorage(U8* storage) { m_storage = storage; }
+        inline void setStorage(U8* storage) { m_texData = storage; }
 
-        inline U8* getStorage() const { return m_storage; }
+        inline U8* getStorage() const { return m_texData; }
 
         template <typename T>
         void setTexel(U32 x, U32 y, T const& newTexel)
@@ -105,61 +117,13 @@ namespace Device { namespace Texture {
             return result;
         }
 
-        inline Vec4f getTexelAsVec4f(U32 x, U32 y) const
-        {
-            U8* pTexel = readTexel(x, y);
-
-            switch (m_format)
-            {
-                case TexelFormat::R32G32B32A32_FLOAT:
-                {
-                    Vec4f data = *reinterpret_cast<Vec4f*>(pTexel);
-                    return data;
-                }
-                case TexelFormat::R32G32B32A32_UINT:
-                {
-                    Vec4<U32> data = *reinterpret_cast<Vec4<U32>*>(pTexel);
-                    return Vec4f{(float)data.x/255, (float)data.y/255, (float)data.z/255, (float)data.w/255};
-                }
-                case TexelFormat::R32G32B32_FLOAT:
-                {
-                    Vec4f data = *reinterpret_cast<Vec4f*>(pTexel);
-                    return Vec4f{data.x, data.y, data.z, 1.0f};
-                }
-                case TexelFormat::R32G32B32_UINT:
-                {
-                    Vec4<U32> data = *reinterpret_cast<Vec4<U32>*>(pTexel);
-                    return Vec4f{(float)data.x/255, (float)data.y/255, (float)data.z/255, 1.0f};
-                }
-                case TexelFormat::R8G8B8A8_UINT:
-                {
-                    Vec4<U8> data = *reinterpret_cast<Vec4<U8>*>(pTexel);
-                    return Vec4f{(float)data.x/255, (float)data.y/255, (float)data.z/255, (float)data.w/255};
-                }
-                case TexelFormat::R8G8B8_UINT:
-                {
-                    Vec4<U8> data = *reinterpret_cast<Vec4<U8>*>(pTexel);
-                    return Vec4f{(float)data.x/255, (float)data.y/255, (float)data.z/255, 1.0f};
-                }
-                case TexelFormat::B8G8R8_UINT:
-                {
-                    Vec4<U8> data = *reinterpret_cast<Vec4<U8>*>(pTexel);
-                    return Vec4f{(float)data.z/255, (float)data.y/255, (float)data.x/255, 1.0f};
-                }
-                case TexelFormat::D32_FLOAT:
-                {
-                    float data = *reinterpret_cast<float*>(pTexel);
-                    return Vec4f{data, data, data, data};
-                }
-                default:
-                    assert(0);
-            }
-
-        }
+        Vec4f getTexelAsVec4f(U32 x, U32 y) const;
 
         void writeTexel(U32 x, U32 y, U8* pNewTexel);
 
         U8* readTexel(U32 x, U32 y) const;
+
+        void generateMipmap();
     };
 
     std::ostream &operator<<(std::ostream &stream, Texture2D const& tex);

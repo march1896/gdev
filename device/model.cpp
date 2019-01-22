@@ -98,39 +98,39 @@ namespace Device { namespace Model {
             // {position},    {normal},            {texCoord},   {color}
             // front
             {{-lx, -ly, +lz}, {0.0f, 0.0f, +1.0f}, {0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
-            {{+lx, -ly, +lz}, {0.0f, 0.0f, +1.0f}, {0.0f, 1.0f}, {0.0f, 1.0f, 0.0f}},
+            {{+lx, -ly, +lz}, {0.0f, 0.0f, +1.0f}, {1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},
             {{+lx, +ly, +lz}, {0.0f, 0.0f, +1.0f}, {1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},
-            {{-lx, +ly, +lz}, {0.0f, 0.0f, +1.0f}, {1.0f, 0.0f}, {1.0f, 1.0f, 0.0f}},
+            {{-lx, +ly, +lz}, {0.0f, 0.0f, +1.0f}, {0.0f, 1.0f}, {1.0f, 1.0f, 0.0f}},
 
             // back
             {{+lx, -ly, -lz}, {0.0f, 0.0f, -1.0f}, {0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
-            {{-lx, -ly, -lz}, {0.0f, 0.0f, -1.0f}, {0.0f, 1.0f}, {0.0f, 1.0f, 0.0f}},
+            {{-lx, -ly, -lz}, {0.0f, 0.0f, -1.0f}, {1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},
             {{-lx, +ly, -lz}, {0.0f, 0.0f, -1.0f}, {1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},
-            {{+lx, +ly, -lz}, {0.0f, 0.0f, -1.0f}, {1.0f, 0.0f}, {1.0f, 1.0f, 0.0f}},
+            {{+lx, +ly, -lz}, {0.0f, 0.0f, -1.0f}, {0.0f, 1.0f}, {1.0f, 1.0f, 0.0f}},
 
             // left
             {{-lx, -ly, -lz}, {-1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
-            {{-lx, -ly, +lz}, {-1.0f, 0.0f, 0.0f}, {0.0f, 1.0f}, {0.0f, 1.0f, 0.0f}},
+            {{-lx, -ly, +lz}, {-1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},
             {{-lx, +ly, +lz}, {-1.0f, 0.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},
-            {{-lx, +ly, -lz}, {-1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, 1.0f, 0.0f}},
+            {{-lx, +ly, -lz}, {-1.0f, 0.0f, 0.0f}, {0.0f, 1.0f}, {1.0f, 1.0f, 0.0f}},
 
             // right
             {{+lx, -ly, +lz}, {+1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
-            {{+lx, -ly, -lz}, {+1.0f, 0.0f, 0.0f}, {0.0f, 1.0f}, {0.0f, 1.0f, 0.0f}},
+            {{+lx, -ly, -lz}, {+1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},
             {{+lx, +ly, -lz}, {+1.0f, 0.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},
-            {{+lx, +ly, +lz}, {+1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, 1.0f, 0.0f}},
+            {{+lx, +ly, +lz}, {+1.0f, 0.0f, 0.0f}, {0.0f, 1.0f}, {1.0f, 1.0f, 0.0f}},
 
             // bottom
             {{-lx, -ly, -lz}, {0.0f, -1.0f, 0.0f}, {0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
-            {{+lx, -ly, -lz}, {0.0f, -1.0f, 0.0f}, {0.0f, 1.0f}, {0.0f, 1.0f, 0.0f}},
+            {{+lx, -ly, -lz}, {0.0f, -1.0f, 0.0f}, {1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},
             {{+lx, -ly, +lz}, {0.0f, -1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},
-            {{-lx, -ly, +lz}, {0.0f, -1.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, 1.0f, 0.0f}},
+            {{-lx, -ly, +lz}, {0.0f, -1.0f, 0.0f}, {0.0f, 1.0f}, {1.0f, 1.0f, 0.0f}},
 
             // top
             {{-lx, +ly, +lz}, {0.0f, +1.0f, 0.0f}, {0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
-            {{+lx, +ly, +lz}, {0.0f, +1.0f, 0.0f}, {0.0f, 1.0f}, {0.0f, 1.0f, 0.0f}},
+            {{+lx, +ly, +lz}, {0.0f, +1.0f, 0.0f}, {1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},
             {{+lx, +ly, -lz}, {0.0f, +1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},
-            {{-lx, +ly, -lz}, {0.0f, +1.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, 1.0f, 0.0f}},
+            {{-lx, +ly, -lz}, {0.0f, +1.0f, 0.0f}, {0.0f, 1.0f}, {1.0f, 1.0f, 0.0f}},
         };
 
         static U32 ib[] =
@@ -240,7 +240,7 @@ namespace Device { namespace Model {
     }
 
     // [ref](https://graphics.stanford.edu/courses/cs148-10-summer/as3/code/as3/teapot.obj)
-    // TODO: fix the problem
+    // TODO: this does not work, maybe try [glutSolidTeapot](https://github.com/dcnieho/FreeGLUT/blob/git_master/freeglut/freeglut/src/fg_teapot_data.h)
     void genTeapot(std::vector<Vec3f>& vertices, std::vector<Vec3f>& normals, std::vector<Vec2f>& texCoords, std::vector<U32>& indices)
     {
         vertices.clear();

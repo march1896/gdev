@@ -260,7 +260,8 @@ void test_fixed_pipeline()
     float* pLightShininess  = (float*)psShader.getConstantAddr("cLightShininess");
     Texture::Texture2D* pTexture = (Texture::Texture2D*)psShader.getConstantAddr("cTexture0");
     Texture::Sampler2D* pSampler = (Texture::Sampler2D*)psShader.getConstantAddr("cSampler0");
-    bitmap_image image("resources/earth2048.bmp");
+    bitmap_image earthImage("resources/earth2048.bmp");
+    bitmap_image lenaImage("resources/lena.bmp");
     {
         Vec4f lightPosWorld = Vec4f{8.0, 8.0, 5.0, 1.0};
         Vec4f lightPos = matView * lightPosWorld;
@@ -271,12 +272,6 @@ void test_fixed_pipeline()
         *pLightSpecular = {1.0, 1.0, 1.0};
         *pLightPower = 100.0;
         *pLightShininess = 4.0;
-
-        // setup texture
-        {
-            *pTexture = {Texture::TexelFormat::B8G8R8_UINT, image.width(), image.height(), image.data()};
-            *pSampler = {Texture::FilterMode::LINEAR, Texture::AddressMode::WRAP, Texture::AddressMode::WRAP};
-        }
     }
 
     device.setVSProgram(vsShader);
@@ -309,6 +304,12 @@ void test_fixed_pipeline()
             // This is not needed for now.
             //Mat44f matWorldViewIT;
             //Mat44f matViewIT;
+        }
+
+        // setup texture
+        {
+            *pTexture = {Texture::TexelFormat::B8G8R8_UINT, lenaImage.width(), lenaImage.height(), lenaImage.data()};
+            *pSampler = {Texture::FilterMode::LINEAR, Texture::AddressMode::WRAP, Texture::AddressMode::WRAP};
         }
 
         device.setVertexBufferChannel(Semantic::Position0, (U8*)vertices.data(), 0, sizeof(Vec3f));
@@ -346,9 +347,11 @@ void test_fixed_pipeline()
 
             Mat44f* pMatWorldViewProj = (Mat44f*)vsShader.getConstantAddr("mWorldViewProj");
             *pMatWorldViewProj = matWorldViewProj;
-
-            // TODO: model color instead of light color?
-            *pLightDiffuse = {0.0, 0.0, 1.0};
+        }
+        // setup texture
+        {
+            *pTexture = {Texture::TexelFormat::B8G8R8_UINT, earthImage.width(), earthImage.height(), earthImage.data()};
+            *pSampler = {Texture::FilterMode::LINEAR, Texture::AddressMode::WRAP, Texture::AddressMode::WRAP};
         }
 
         device.setVertexBufferChannel(Semantic::Position0, (U8*)vertices.data(), 0, sizeof(Vec3f));

@@ -161,7 +161,7 @@ namespace Texture {
         TexelType const& texelType = s_texelTypes[(U32)m_format];
         U32 texelSize = texelType.getSize();
         U32 offset = (x + m_width * y) * texelSize;
-        U8* texelAddr = m_storage + offset;
+        U8* texelAddr = m_texData + offset;
 
         std::memcpy(texelAddr, pNewTexel, texelSize);
     }
@@ -171,7 +171,64 @@ namespace Texture {
         TexelType const& texelType = s_texelTypes[(U32)m_format];
         U32 texelSize = texelType.getSize();
         U32 offset = (x + m_width * y) * texelSize;
-        return m_storage + offset;
+        return m_texData + offset;
+    }
+
+    Vec4f Texture2D::getTexelAsVec4f(U32 x, U32 y) const
+    {
+        U8* pTexel = readTexel(x, y);
+
+        switch (m_format)
+        {
+            case TexelFormat::R32G32B32A32_FLOAT:
+            {
+                Vec4f data = *reinterpret_cast<Vec4f*>(pTexel);
+                return data;
+            }
+            case TexelFormat::R32G32B32A32_UINT:
+            {
+                Vec4<U32> data = *reinterpret_cast<Vec4<U32>*>(pTexel);
+                return Vec4f{(float)data.x/255, (float)data.y/255, (float)data.z/255, (float)data.w/255};
+            }
+            case TexelFormat::R32G32B32_FLOAT:
+            {
+                Vec4f data = *reinterpret_cast<Vec4f*>(pTexel);
+                return Vec4f{data.x, data.y, data.z, 1.0f};
+            }
+            case TexelFormat::R32G32B32_UINT:
+            {
+                Vec4<U32> data = *reinterpret_cast<Vec4<U32>*>(pTexel);
+                return Vec4f{(float)data.x/255, (float)data.y/255, (float)data.z/255, 1.0f};
+            }
+            case TexelFormat::R8G8B8A8_UINT:
+            {
+                Vec4<U8> data = *reinterpret_cast<Vec4<U8>*>(pTexel);
+                return Vec4f{(float)data.x/255, (float)data.y/255, (float)data.z/255, (float)data.w/255};
+            }
+            case TexelFormat::R8G8B8_UINT:
+            {
+                Vec4<U8> data = *reinterpret_cast<Vec4<U8>*>(pTexel);
+                return Vec4f{(float)data.x/255, (float)data.y/255, (float)data.z/255, 1.0f};
+            }
+            case TexelFormat::B8G8R8_UINT:
+            {
+                Vec4<U8> data = *reinterpret_cast<Vec4<U8>*>(pTexel);
+                return Vec4f{(float)data.z/255, (float)data.y/255, (float)data.x/255, 1.0f};
+            }
+            case TexelFormat::D32_FLOAT:
+            {
+                float data = *reinterpret_cast<float*>(pTexel);
+                return Vec4f{data, data, data, data};
+            }
+            default:
+                assert(0);
+        }
+
+    }
+
+    void Texture2D::generateMipmap()
+    {
+        // TODO: to support mipmap, the rasterizer must pass adjacent pixel information to here.
     }
 
     // [ref](https://en.wikipedia.org/wiki/Bilinear_filtering)
