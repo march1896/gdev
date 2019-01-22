@@ -180,9 +180,7 @@ namespace Device {
 
             Vec3f lightColor = ambientLinear + diffuseLinear + specularLinear;
             Vec4f texColor = Texture::Sample(cTexture0, cSampler0, inTexCoord);
-            // TODO: continue, mix the texture color with lighting color.
-            // outColor = lightColor;
-            outColor = {texColor.x, texColor.y, texColor.z};
+            outColor = lightColor * Vec3f{texColor.x, texColor.y, texColor.z};
 
             // apply gamma correction (assume cLightAmbient, cLightDiffuse and cLightSpecular
             // have been linearized, i.e. have no gamma correction in them)

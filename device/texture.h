@@ -6,69 +6,7 @@
 
 #include "vmath.h"
 
-namespace Device {
-    template <typename ColorFormat>
-    class Surface
-    {
-    protected:
-        U32 m_width;
-        U32 m_height;
-        std::vector<ColorFormat> m_buffer;
-
-    public:
-        Surface()
-            : m_width(0)
-            , m_height(0)
-        {
-            m_buffer.resize(m_width * m_height);
-        }
-
-        Surface(U32 width, U32 height)
-            : m_width(width)
-            , m_height(height)
-        {
-            m_buffer.resize(m_width * m_height);
-        }
-
-        void resize(U32 width, U32 height)
-        {
-            if (m_width == width && m_height == height)
-            {
-                return;
-            }
-            m_width = width;
-            m_height = height;
-            m_buffer.resize(m_width * m_height);
-        }
-
-        U32 getWidth() const
-        {
-            return m_width;
-        }
-
-        U32 getHeight() const
-        {
-            return m_height;
-        }
-
-        void setPixel(U32 x, U32 y, ColorFormat const& color)
-        {
-            m_buffer[x + m_width * y] = color;
-        }
-
-        ColorFormat getPixel(U32 x, U32 y) const
-        {
-            return m_buffer[x + m_width * y];
-        }
-    };
-
-    void saveAsBmp(std::string const& filename, Surface<Vec3f> colorTarget);
-
-    void saveAsBmp(std::string const& filename, Surface<float> depthTarget);
-}
-
-namespace Device {
-namespace Texture {
+namespace Device { namespace Texture {
     enum class FilterMode
     {
         NEAREST,
@@ -231,6 +169,7 @@ namespace Texture {
     Vec4f Sample(Texture2D const& tex, Sampler2D const& samp, Vec2f const& uv);
 
     void saveAsBmp(std::string const& filename, Texture2D const& colorTarget);
+
 } // namespace Texture
 } // namespace Device
 #endif // _TEXTURE_H_
