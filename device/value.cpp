@@ -30,6 +30,9 @@ namespace Device {
                 return sizeof(Texture::Sampler2D);
             case BuiltinType::TEXTURE2D:
                 return sizeof(Texture::Texture2D);
+            default:
+                assert(0);
+                return 0;
         }
     }
 

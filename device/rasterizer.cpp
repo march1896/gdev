@@ -6,38 +6,35 @@ namespace {
     using namespace Device;
 
     // Plane equation.
-    // P(x, y, z) = a*x + b*y + c*z + d;
+    // P(x, y, z) = A*x + B*y + C*z + D;
     struct TrianglePlaneMeta
     {
-        typedef StructType Type;
-        typedef StructValueRef Value;
-
-        Type structure;
-        //Value A;
-        //Value B;
-        //Value C;
-        //Value D;
+        StructType structure;
+        StructValueRef A;
+        StructValueRef B;
+        StructValueRef C;
+        StructValueRef D;
         U8* m_storage;
 
-        TrianglePlaneMeta(Type const& t, Value const& a, Value const& b, Value const& c)
+        TrianglePlaneMeta(StructType const& t, StructValueRef const& a, StructValueRef const& b, StructValueRef const& c)
             : structure(t)
-            //, A(&structure, nullptr)
-            //, B(&structure, nullptr)
-            //, C(&structure, nullptr)
-            //, D(&structure, nullptr)
+            , A(structure, nullptr)
+            , B(structure, nullptr)
+            , C(structure, nullptr)
+            , D(structure, nullptr)
         {
             m_storage = (U8*)malloc(structure.getSize() * 4);
 
-            //Value A{&structure, m_storage + structure.getSize() * 0};
-            //Value B{&structure, m_storage + structure.getSize() * 1};
-            //Value C{&structure, m_storage + structure.getSize() * 2};
-            //Value D{&structure, m_storage + structure.getSize() * 3};
+            A.bind(m_storage + structure.getSize() * 0);
+            B.bind(m_storage + structure.getSize() * 1);
+            C.bind(m_storage + structure.getSize() * 2);
+            D.bind(m_storage + structure.getSize() * 3);
 
+            // TODO: continue
             for (U32 fieldIdx = 0; fieldIdx < structure.numFields(); ++fieldIdx)
             {
 
             }
-
         }
 
         ~TrianglePlaneMeta()
