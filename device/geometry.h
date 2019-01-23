@@ -1,7 +1,7 @@
 #ifndef _GEOMETRY_H_
 #define _GEOMETRY_H_
 
-#include "vmath.h"
+#include "vector.h"
 
 namespace Device {
     struct Line2D

@@ -3,12 +3,11 @@
 
 #include <cstring>
 
-#include "vmath.h"
+#include "vector.h"
 #include "semantic.h"
 #include "texture.h"
 
 namespace Device {
-    // TODO: move this to standalong file?
     enum class BuiltinType
     {
         UNKNOWN,
@@ -109,10 +108,11 @@ namespace Device {
         inline void write(U8* new_val) { std::memcpy(m_pAddr, new_val, SizeOf(m_type)); }
 
         inline void bind(U8* addr) { m_pAddr = addr; }
-
     };
 
     typedef ValueRef<BuiltinType> BuiltinValueRef;
+
+    void mul_i(BuiltinValueRef& out, BuiltinValueRef const& a, BuiltinValueRef const& b);
 
     // Note: only inplace interpolate is support for the reference type.
     void interpolate_inplace(BuiltinValueRef& out, BuiltinValueRef const& a, float u, BuiltinValueRef const& b, float v);

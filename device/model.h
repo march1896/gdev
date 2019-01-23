@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include "vmath.h"
+#include "vector.h"
 
 namespace Device { namespace Model {
     void genTriangle(std::vector<Vec3f>& vertices, std::vector<Vec3f>& normals, std::vector<Vec2f>& texCoords, std::vector<U32>& indices);

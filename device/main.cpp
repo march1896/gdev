@@ -6,6 +6,8 @@
 
 #include "bitmap_image.h"
 
+#include "vector.h"
+#include "matrix.h"
 #include "vmath.h"
 #include "semantic.h"
 #include "shader.h"

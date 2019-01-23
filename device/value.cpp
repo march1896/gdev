@@ -1,8 +1,12 @@
 #include <algorithm>
 
+#include "vector.h"
+#include "matrix.h"
+#include "vmath.h"
 #include "value.h"
 
 namespace Device {
+
     U32 SizeOf(BuiltinType const& type)
     {
         switch (type)
@@ -36,30 +40,36 @@ namespace Device {
         }
     }
 
-    void interpolate_inplace(BuiltinValueRef& out, BuiltinValueRef const& a, float u, BuiltinValueRef const& b, float v)
+    // TODO: continue
+    void mul_i(BuiltinValueRef& out, BuiltinValueRef const& a, BuiltinValueRef const& b)
     {
         assert(out.type() == a.type());
         assert(out.type() == b.type());
+
         switch (out.type())
         {
             case BuiltinType::FLOAT:
             {
-                ::interpolate_inplace(out.readAs<float>(), a.readAs<float>(), u, b.readAs<float>(), v);
+                float temp = a.readAs<float>() + b.readAs<float>();
+                out.write((U8*)&temp);
                 break;
             }
             case BuiltinType::FLOAT2:
             {
-                ::interpolate_inplace(out.readAs<Vec2f>(), a.readAs<Vec2f>(), u, b.readAs<Vec2f>(), v);
+                Vec2f temp = a.readAs<Vec2f>() + b.readAs<Vec2f>();
+                out.write((U8*)&temp);
                 break;
             }
             case BuiltinType::FLOAT3:
             {
-                ::interpolate_inplace(out.readAs<Vec3f>(), a.readAs<Vec3f>(), u, b.readAs<Vec3f>(), v);
+                Vec3f temp = a.readAs<Vec3f>() + b.readAs<Vec3f>();
+                out.write((U8*)&temp);
                 break;
             }
             case BuiltinType::FLOAT4:
             {
-                ::interpolate_inplace(out.readAs<Vec4f>(), a.readAs<Vec4f>(), u, b.readAs<Vec4f>(), v);
+                Vec4f temp = a.readAs<Vec4f>() + b.readAs<Vec4f>();
+                out.write((U8*)&temp);
                 break;
             }
             case BuiltinType::HALF:
@@ -70,17 +80,74 @@ namespace Device {
             }
             case BuiltinType::DOUBLE:
             {
-                ::interpolate_inplace(out.readAs<double>(), a.readAs<double>(), u, b.readAs<double>(), v);
+                double temp = a.readAs<double>() + b.readAs<double>();
+                out.write((U8*)&temp);
                 break;
             }
             case BuiltinType::INT:
             {
-                ::interpolate_inplace(out.readAs<int>(), a.readAs<int>(), u, b.readAs<int>(), v);
+                int temp = a.readAs<int>() + b.readAs<int>();
+                out.write((U8*)&temp);
                 break;
             }
             case BuiltinType::UINT:
             {
-                ::interpolate_inplace(out.readAs<U32>(), a.readAs<U32>(), u, b.readAs<U32>(), v);
+                U32 temp = a.readAs<U32>() + b.readAs<U32>();
+                out.write((U8*)&temp);
+                break;
+            }
+            default:
+            {
+                assert(0);
+            }
+        }
+    }
+
+    void interpolate_inplace(BuiltinValueRef& out, BuiltinValueRef const& a, float u, BuiltinValueRef const& b, float v)
+    {
+        assert(out.type() == a.type());
+        assert(out.type() == b.type());
+        switch (out.type())
+        {
+            case BuiltinType::FLOAT:
+            {
+                interpolate_inplace(out.readAs<float>(), a.readAs<float>(), u, b.readAs<float>(), v);
+                break;
+            }
+            case BuiltinType::FLOAT2:
+            {
+                interpolate_inplace(out.readAs<Vec2f>(), a.readAs<Vec2f>(), u, b.readAs<Vec2f>(), v);
+                break;
+            }
+            case BuiltinType::FLOAT3:
+            {
+                interpolate_inplace(out.readAs<Vec3f>(), a.readAs<Vec3f>(), u, b.readAs<Vec3f>(), v);
+                break;
+            }
+            case BuiltinType::FLOAT4:
+            {
+                interpolate_inplace(out.readAs<Vec4f>(), a.readAs<Vec4f>(), u, b.readAs<Vec4f>(), v);
+                break;
+            }
+            case BuiltinType::HALF:
+            {
+                // TODO:
+                assert(0);
+                break;
+            }
+            case BuiltinType::DOUBLE:
+            {
+                interpolate_inplace(out.readAs<double>(), a.readAs<double>(), u, b.readAs<double>(), v);
+                break;
+            }
+            case BuiltinType::INT:
+            {
+                interpolate_inplace(out.readAs<int>(), a.readAs<int>(), u, b.readAs<int>(), v);
+                break;
+            }
+            case BuiltinType::UINT:
+            {
+                interpolate_inplace(out.readAs<U32>(), a.readAs<U32>(), u, b.readAs<U32>(), v);
                 break;
             }
             default:
@@ -100,22 +167,22 @@ namespace Device {
         {
             case BuiltinType::FLOAT:
             {
-                ::interpolate_inplace(out.readAs<float>(), a.readAs<float>(), u, b.readAs<float>(), v, c.readAs<float>(), w);
+                interpolate_inplace(out.readAs<float>(), a.readAs<float>(), u, b.readAs<float>(), v, c.readAs<float>(), w);
                 break;
             }
             case BuiltinType::FLOAT2:
             {
-                ::interpolate_inplace(out.readAs<Vec2f>(), a.readAs<Vec2f>(), u, b.readAs<Vec2f>(), v, c.readAs<Vec2f>(), w);
+                interpolate_inplace(out.readAs<Vec2f>(), a.readAs<Vec2f>(), u, b.readAs<Vec2f>(), v, c.readAs<Vec2f>(), w);
                 break;
             }
             case BuiltinType::FLOAT3:
             {
-                ::interpolate_inplace(out.readAs<Vec3f>(), a.readAs<Vec3f>(), u, b.readAs<Vec3f>(), v, c.readAs<Vec3f>(), w);
+                interpolate_inplace(out.readAs<Vec3f>(), a.readAs<Vec3f>(), u, b.readAs<Vec3f>(), v, c.readAs<Vec3f>(), w);
                 break;
             }
             case BuiltinType::FLOAT4:
             {
-                ::interpolate_inplace(out.readAs<Vec4f>(), a.readAs<Vec4f>(), u, b.readAs<Vec4f>(), v, c.readAs<Vec4f>(), w);
+                interpolate_inplace(out.readAs<Vec4f>(), a.readAs<Vec4f>(), u, b.readAs<Vec4f>(), v, c.readAs<Vec4f>(), w);
                 break;
             }
             case BuiltinType::HALF:
@@ -126,17 +193,17 @@ namespace Device {
             }
             case BuiltinType::DOUBLE:
             {
-                ::interpolate_inplace(out.readAs<double>(), a.readAs<double>(), u, b.readAs<double>(), v, c.readAs<double>(), w);
+                interpolate_inplace(out.readAs<double>(), a.readAs<double>(), u, b.readAs<double>(), v, c.readAs<double>(), w);
                 break;
             }
             case BuiltinType::INT:
             {
-                ::interpolate_inplace(out.readAs<int>(), a.readAs<int>(), u, b.readAs<int>(), v, c.readAs<int>(), w);
+                interpolate_inplace(out.readAs<int>(), a.readAs<int>(), u, b.readAs<int>(), v, c.readAs<int>(), w);
                 break;
             }
             case BuiltinType::UINT:
             {
-                ::interpolate_inplace(out.readAs<U32>(), a.readAs<U32>(), u, b.readAs<U32>(), v, c.readAs<U32>(), w);
+                interpolate_inplace(out.readAs<U32>(), a.readAs<U32>(), u, b.readAs<U32>(), v, c.readAs<U32>(), w);
                 break;
             }
             default:

@@ -7,7 +7,7 @@
 #include <climits>
 #include <iostream>
 
-#include "vmath.h"
+#include "vector.h"
 #include "value.h"
 #include "semantic.h"
 #include "texture.h"

@@ -1,7 +1,7 @@
 #ifndef _SHADER_PROCESSOR_H_
 #define _SHADER_PROCESSOR_H_
 
-#include "vmath.h"
+#include "prelude.h"
 #include "component.h"
 #include "shader.h"
 

@@ -1,6 +1,6 @@
 #ifndef _PRIMITIVE_ASSEMBLER_H_
 #define _PRIMITIVE_ASSEMBLER_H_
-#include "vmath.h"
+#include "prelude.h"
 #include "component.h"
 
 namespace Device {

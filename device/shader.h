@@ -11,7 +11,6 @@
 #include <deque>
 #include <map>
 
-#include "vmath.h"
 #include "buffer.h"
 #include "semantic.h"
 #include "component.h"

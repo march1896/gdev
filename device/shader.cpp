@@ -1,5 +1,7 @@
 #include <algorithm>
 
+#include "vector.h"
+#include "matrix.h"
 #include "shader.h"
 #include "texture.h"
 

@@ -1,5 +1,6 @@
 #include <algorithm>
 
+#include "vmath.h"
 #include "rasterizer.h"
 
 namespace {

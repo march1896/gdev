@@ -1,7 +1,7 @@
 #ifndef _RASTERIZER_H_
 #define _RASTERIZER_H_
 
-#include "vmath.h"
+#include "vector.h"
 #include "buffer.h"
 #include "geometry.h"
 #include "component.h"

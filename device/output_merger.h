@@ -1,7 +1,8 @@
 #ifndef _OUTPUT_MERGER_H_
 #define _OUTPUT_MERGER_H_
 
-#include "vmath.h"
+#include "prelude.h"
+#include "vector.h"
 #include "texture.h"
 #include "component.h"
 

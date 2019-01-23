@@ -1,6 +1,6 @@
 #ifndef _SEMANTIC_H_
 #define _SEMANTIC_H_
-#include "vmath.h"
+#include "prelude.h"
 
 namespace Device {
 

@@ -4,7 +4,7 @@
 #include <vector>
 #include <iostream>
 
-#include "vmath.h"
+#include "vector.h"
 
 namespace Device { namespace Texture {
     enum class FilterMode
